@@ -1,20 +1,17 @@
 function mostrarBinario(){
   let arreglo = document.getElementById("binario").value;
-  let resultado = '';
+  let resultado = [];
 
+  // Optimization: use toString(2) and padStart for faster binary conversion
+  // and use an array with join(' ') to avoid repeated string concatenation.
   for (let i = 0; i < arreglo.length; i++) {
-    let charCode = arreglo.charCodeAt(i);
-    let binario = '';
-
-    for (let j = 7; j >= 0; j--) {
-      binario += (charCode & (1 << j)) ? '1' : '0';
-    }
-
-    resultado += binario + ' ';
+    // Truncate to 8 bits to match original behavior and pad with leading zeros
+    resultado.push((arreglo.charCodeAt(i) & 0xFF).toString(2).padStart(8, '0'));
   }
 
-  document.getElementById("bin").innerHTML = "El número binario es " + resultado.trim();
-  console.log(resultado.trim());
+  const finalResult = resultado.join(' ');
+  document.getElementById("bin").innerHTML = "El número binario es " + finalResult;
+  console.log(finalResult);
 }
 
 function mostrarBinario1() {
