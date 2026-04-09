@@ -1,20 +1,25 @@
+// Precompute binary strings for all 256 possible byte values
+// This provides a significant speedup for large inputs by avoiding repeated bitwise operations and string padding
+const BYTE_TO_BIN = Array.from({ length: 256 }, (_, i) => i.toString(2).padStart(8, '0'));
+
+/**
+ * Converts input text to a space-separated string of 8-bit binary representations.
+ * Optimized with a lookup table and array join for O(n) performance.
+ */
 function mostrarBinario(){
-  let arreglo = document.getElementById("binario").value;
-  let resultado = '';
+  let input = document.getElementById("binario").value;
+  const len = input.length;
+  // Use an array to collect results and join at the end for O(n) string construction
+  let resultado = new Array(len);
 
-  for (let i = 0; i < arreglo.length; i++) {
-    let charCode = arreglo.charCodeAt(i);
-    let binario = '';
-
-    for (let j = 7; j >= 0; j--) {
-      binario += (charCode & (1 << j)) ? '1' : '0';
-    }
-
-    resultado += binario + ' ';
+  for (let i = 0; i < len; i++) {
+    // Treat characters as 8-bit bytes, matching original behavior
+    resultado[i] = BYTE_TO_BIN[input.charCodeAt(i) & 0xFF] || '00000000';
   }
 
-  document.getElementById("bin").innerHTML = "El número binario es " + resultado.trim();
-  console.log(resultado.trim());
+  const finalResult = resultado.join(' ');
+  document.getElementById("bin").innerHTML = "El número binario es " + finalResult;
+  console.log(finalResult);
 }
 
 function mostrarBinario1() {
