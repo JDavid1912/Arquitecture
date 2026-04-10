@@ -1,20 +1,23 @@
+// Precomputed lookup table for byte-to-binary mapping (0-255)
+// This avoids expensive bitwise operations and string concatenations in loops.
+const binaryLookup = Array.from({ length: 256 }, (_, i) => i.toString(2).padStart(8, '0'));
+
 function mostrarBinario(){
-  let arreglo = document.getElementById("binario").value;
-  let resultado = '';
+  const input = document.getElementById("binario").value;
+  const len = input.length;
+  const result = new Array(len);
 
-  for (let i = 0; i < arreglo.length; i++) {
-    let charCode = arreglo.charCodeAt(i);
-    let binario = '';
-
-    for (let j = 7; j >= 0; j--) {
-      binario += (charCode & (1 << j)) ? '1' : '0';
-    }
-
-    resultado += binario + ' ';
+  // Using a precomputed lookup table and Array.join() is significantly faster
+  // than manual bit manipulation and string concatenation for large inputs.
+  for (let i = 0; i < len; i++) {
+    // We use & 0xFF to handle standard ASCII/Extended ASCII range (0-255)
+    const charCode = input.charCodeAt(i) & 0xFF;
+    result[i] = binaryLookup[charCode];
   }
 
-  document.getElementById("bin").innerHTML = "El número binario es " + resultado.trim();
-  console.log(resultado.trim());
+  const finalString = result.join(' ');
+  document.getElementById("bin").innerHTML = "El número binario es " + finalString;
+  console.log(finalString);
 }
 
 function mostrarBinario1() {
