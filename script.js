@@ -1,20 +1,20 @@
+// Precomputed lookup table for byte to binary string conversion (0-255)
+const BYTE_TO_BIN = Array.from({ length: 256 }, (_, i) => i.toString(2).padStart(8, '0'));
+
 function mostrarBinario(){
-  let arreglo = document.getElementById("binario").value;
-  let resultado = '';
+  const input = document.getElementById("binario").value;
+  const len = input.length;
+  const resultado = new Array(len);
 
-  for (let i = 0; i < arreglo.length; i++) {
-    let charCode = arreglo.charCodeAt(i);
-    let binario = '';
-
-    for (let j = 7; j >= 0; j--) {
-      binario += (charCode & (1 << j)) ? '1' : '0';
-    }
-
-    resultado += binario + ' ';
+  // Use precomputed table and Array.join for better performance than string concatenation in a loop
+  for (let i = 0; i < len; i++) {
+    resultado[i] = BYTE_TO_BIN[input.charCodeAt(i) & 0xFF];
   }
 
-  document.getElementById("bin").innerHTML = "El número binario es " + resultado.trim();
-  console.log(resultado.trim());
+  const resultString = resultado.join(' ');
+  // textContent is faster and safer than innerHTML for plain text
+  document.getElementById("bin").textContent = "El número binario es " + resultString;
+  console.log(resultString);
 }
 
 function mostrarBinario1() {
