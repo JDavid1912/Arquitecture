@@ -1,0 +1,3 @@
+## 2025-04-14 - Precomputed lookup table for character conversion
+**Learning:** In string processing tasks like binary conversion, using a precomputed lookup table (256 entries for bytes) significantly outperforms bitwise operations and manual string concatenation in loops. Combining this with `Array.join()` instead of repeated string concatenation (`+=`) provides a substantial performance boost. Replaced `innerHTML` with `textContent` for faster and safer DOM updates.
+**Action:** Always consider lookup tables for fixed-domain conversions (like 0-255) and prefer array building + join over string concatenation in tight loops.
