@@ -1,0 +1,3 @@
+## 2025-05-15 - [Correctness vs. Idiomatic JS in UTF-16]
+**Learning:** Using `Array.from(string)` or `[...string]` for iteration in JavaScript splits the string by Unicode code points. While idiomatic, it can break legacy logic that expects to process UTF-16 code units (surrogate pairs) individually. In this application, the 8-bit binary conversion logic is based on `charCodeAt` (code units). Switching to `Array.from` caused a regression in how multi-unit characters were handled.
+**Action:** Always verify if the existing logic depends on UTF-16 code unit iteration before switching to code point iteration (like `Array.from`). For performance, a standard `for` loop with a pre-allocated array remains the fastest approach for simple string-to-array transformations.
