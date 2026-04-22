@@ -1,0 +1,3 @@
+## 2025-05-14 - Character-to-Binary Lookup Table Optimization
+**Learning:** For character-by-character transformations like char-to-binary, using a precomputed lookup table (256 entries for 8-bit) combined with `Array.join()` is significantly faster than bitwise calculations and string concatenation in a loop. String concatenation in JS can lead to O(n^2) performance due to string immutability, while `Array.join()` is optimized for bulk string construction.
+**Action:** Always prefer precomputed lookup tables for finite domains (like bytes) and `Array.join()` for building large strings from parts.
