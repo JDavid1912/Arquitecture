@@ -1,20 +1,32 @@
+// Precomputed binary lookup table for 8-bit characters (0-255)
+// Bolt ⚡: Using a lookup table avoids bitwise calculations in the hot path.
+const BINARY_LOOKUP = new Array(256);
+for (let i = 0; i < 256; i++) {
+  BINARY_LOOKUP[i] = i.toString(2).padStart(8, '0');
+}
+
+/**
+ * Optimización Bolt ⚡:
+ * 1. Uso de tabla de búsqueda (lookup table) para evitar cálculos de bits en cada iteración.
+ * 2. Uso de Array y join(' ') en lugar de concatenación de strings en bucle (evita O(n^2)).
+ * 3. Uso de textContent en lugar de innerHTML para mejor rendimiento y seguridad.
+ * 4. Pre-asignación del tamaño del array para evitar re-dimensionamiento dinámico.
+ */
 function mostrarBinario(){
-  let arreglo = document.getElementById("binario").value;
-  let resultado = '';
+  const input = document.getElementById("binario").value;
+  const len = input.length;
+  const resultado = new Array(len);
 
-  for (let i = 0; i < arreglo.length; i++) {
-    let charCode = arreglo.charCodeAt(i);
-    let binario = '';
-
-    for (let j = 7; j >= 0; j--) {
-      binario += (charCode & (1 << j)) ? '1' : '0';
-    }
-
-    resultado += binario + ' ';
+  for (let i = 0; i < len; i++) {
+    // Aseguramos que el charCode esté en el rango 0-255 para la tabla de búsqueda
+    // El código original procesaba 8 bits, por lo que mantenemos esa lógica.
+    const charCode = input.charCodeAt(i) & 0xFF;
+    resultado[i] = BINARY_LOOKUP[charCode];
   }
 
-  document.getElementById("bin").innerHTML = "El número binario es " + resultado.trim();
-  console.log(resultado.trim());
+  const finalString = resultado.join(' ');
+  document.getElementById("bin").textContent = "El número binario es " + finalString;
+  console.log(finalString);
 }
 
 function mostrarBinario1() {
