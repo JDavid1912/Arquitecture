@@ -1,20 +1,23 @@
-function mostrarBinario(){
-  let arreglo = document.getElementById("binario").value;
-  let resultado = '';
+// Precomputed lookup table for 8-bit binary representation (0-255)
+// This avoids repeated bitwise operations and string padding during conversion.
+const BINARY_LOOKUP = Array.from({ length: 256 }, (_, i) => i.toString(2).padStart(8, '0'));
 
-  for (let i = 0; i < arreglo.length; i++) {
-    let charCode = arreglo.charCodeAt(i);
-    let binario = '';
+function mostrarBinario() {
+  const input = document.getElementById("binario").value;
+  const len = input.length;
+  // Pre-allocating the array is faster than push() for large strings.
+  const result = new Array(len);
 
-    for (let j = 7; j >= 0; j--) {
-      binario += (charCode & (1 << j)) ? '1' : '0';
-    }
-
-    resultado += binario + ' ';
+  for (let i = 0; i < len; i++) {
+    // Bitmasking with 0xFF ensures we only use the lower 8 bits,
+    // maintaining consistency with the original 8-bit loop logic.
+    result[i] = BINARY_LOOKUP[input.charCodeAt(i) & 0xFF];
   }
 
-  document.getElementById("bin").innerHTML = "El número binario es " + resultado.trim();
-  console.log(resultado.trim());
+  // join(' ') is significantly faster than repeated string concatenation in a loop.
+  const finalResult = result.join(' ');
+  document.getElementById("bin").textContent = "El número binario es " + finalResult;
+  console.log(finalResult);
 }
 
 function mostrarBinario1() {
@@ -40,5 +43,5 @@ function mostrarCaracter(){
   let binario = document.getElementById("caracter").value;
   let decimal = parseInt(binario, 2);
   let caracter = String.fromCharCode(decimal);
-  document.getElementById("bin1").innerHTML = "El carácter es " + caracter;
+  document.getElementById("bin1").textContent = "El carácter es " + caracter;
 }
