@@ -1,44 +1,48 @@
-function mostrarBinario(){
-  let arreglo = document.getElementById("binario").value;
-  let resultado = '';
+// Precompute binary lookup table for performance
+const BINARY_LOOKUP = Array.from({ length: 256 }, (_, i) => i.toString(2).padStart(8, '0'));
 
-  for (let i = 0; i < arreglo.length; i++) {
-    let charCode = arreglo.charCodeAt(i);
-    let binario = '';
+function mostrarBinario() {
+  const input = document.getElementById("binario").value;
+  const len = input.length;
+  const result = new Array(len);
 
-    for (let j = 7; j >= 0; j--) {
-      binario += (charCode & (1 << j)) ? '1' : '0';
-    }
-
-    resultado += binario + ' ';
+  for (let i = 0; i < len; i++) {
+    // Bitmask with 0xFF to handle only the lower 8 bits (standard ASCII/Extended ASCII)
+    // as per the original 8-bit loop logic.
+    result[i] = BINARY_LOOKUP[input.charCodeAt(i) & 0xFF];
   }
 
-  document.getElementById("bin").innerHTML = "El número binario es " + resultado.trim();
-  console.log(resultado.trim());
+  const output = result.join(' ');
+  document.getElementById("bin").textContent = "El número binario es " + output;
+  console.log(output);
 }
 
 function mostrarBinario1() {
-  let binario = document.getElementById("binario1").value;
-  let caracteres = '';
+  const binario = document.getElementById("binario1").value;
+  const len = binario.length;
+  const result = [];
 
-  for (let i = 0; i < binario.length; i += 8) {
-    let byte = binario.substr(i, 8);
-    let charCode = 0;
+  for (let i = 0; i < len; i += 8) {
+    const byte = binario.substring(i, i + 8);
+    const charCode = parseInt(byte, 2);
 
-    for (let j = 0; j < byte.length; j++) {
-      charCode = charCode * 2 + (byte[j] === '1' ? 1 : 0);
+    if (!isNaN(charCode)) {
+      result.push(String.fromCharCode(charCode));
     }
-
-    caracteres += String.fromCharCode(charCode);
   }
 
-  document.getElementById("bin1").innerHTML = "El carácter es " + caracteres;
-  console.log(caracteres);
+  const output = result.join('');
+  document.getElementById("bin1").textContent = "El carácter es " + output;
+  console.log(output);
 }
 
 function mostrarCaracter(){  
-  let binario = document.getElementById("caracter").value;
-  let decimal = parseInt(binario, 2);
-  let caracter = String.fromCharCode(decimal);
-  document.getElementById("bin1").innerHTML = "El carácter es " + caracter;
+  const binario = document.getElementById("caracter").value;
+  const decimal = parseInt(binario, 2);
+  if (isNaN(decimal)) {
+    document.getElementById("bin1").textContent = "Entrada inválida";
+    return;
+  }
+  const caracter = String.fromCharCode(decimal);
+  document.getElementById("bin1").textContent = "El carácter es " + caracter;
 }
