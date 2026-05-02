@@ -1,20 +1,25 @@
+// Precomputed lookup table for 8-bit binary strings (0-255)
+// This avoids repeated bitwise calculations and string padding in the hot path.
+const BINARY_LOOKUP = Array.from({ length: 256 }, (_, i) => i.toString(2).padStart(8, '0'));
+
 function mostrarBinario(){
   let arreglo = document.getElementById("binario").value;
-  let resultado = '';
+  let len = arreglo.length;
 
-  for (let i = 0; i < arreglo.length; i++) {
-    let charCode = arreglo.charCodeAt(i);
-    let binario = '';
+  // Pre-allocating the array is more efficient than repeatedly pushing or concatenating strings.
+  let results = new Array(len);
 
-    for (let j = 7; j >= 0; j--) {
-      binario += (charCode & (1 << j)) ? '1' : '0';
-    }
-
-    resultado += binario + ' ';
+  for (let i = 0; i < len; i++) {
+    // Masking with 0xFF ensures we stay within the 0-255 range for the lookup table.
+    results[i] = BINARY_LOOKUP[arreglo.charCodeAt(i) & 0xFF];
   }
 
-  document.getElementById("bin").innerHTML = "El número binario es " + resultado.trim();
-  console.log(resultado.trim());
+  // Using Array.join(' ') is much faster than string concatenation in a loop (O(n) vs O(n^2)).
+  let resultado = results.join(' ');
+
+  // Using textContent is faster and more secure than innerHTML.
+  document.getElementById("bin").textContent = "El número binario es " + resultado;
+  console.log(resultado);
 }
 
 function mostrarBinario1() {
@@ -22,17 +27,15 @@ function mostrarBinario1() {
   let caracteres = '';
 
   for (let i = 0; i < binario.length; i += 8) {
-    let byte = binario.substr(i, 8);
-    let charCode = 0;
+    let byte = binario.substring(i, i + 8);
+    let charCode = parseInt(byte, 2);
 
-    for (let j = 0; j < byte.length; j++) {
-      charCode = charCode * 2 + (byte[j] === '1' ? 1 : 0);
+    if (!isNaN(charCode)) {
+      caracteres += String.fromCharCode(charCode);
     }
-
-    caracteres += String.fromCharCode(charCode);
   }
 
-  document.getElementById("bin1").innerHTML = "El carácter es " + caracteres;
+  document.getElementById("bin1").textContent = "El carácter es " + caracteres;
   console.log(caracteres);
 }
 
@@ -40,5 +43,6 @@ function mostrarCaracter(){
   let binario = document.getElementById("caracter").value;
   let decimal = parseInt(binario, 2);
   let caracter = String.fromCharCode(decimal);
-  document.getElementById("bin1").innerHTML = "El carácter es " + caracter;
+  // Consistent use of textContent for performance and security.
+  document.getElementById("bin1").textContent = "El carácter es " + caracter;
 }
