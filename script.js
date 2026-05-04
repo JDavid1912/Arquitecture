@@ -1,44 +1,53 @@
-function mostrarBinario(){
-  let arreglo = document.getElementById("binario").value;
-  let resultado = '';
+// Precompute 8-bit binary strings for all 256 possible byte values to avoid redundant calculations.
+// Bolt ⚡ Optimization: O(1) lookup instead of O(n) bitwise loop per character.
+const BINARY_LOOKUP = Array.from({ length: 256 }, (_, i) => i.toString(2).padStart(8, '0'));
 
-  for (let i = 0; i < arreglo.length; i++) {
-    let charCode = arreglo.charCodeAt(i);
-    let binario = '';
+function mostrarBinario() {
+  const input = document.getElementById("binario").value;
+  const len = input.length;
+  const resultados = new Array(len);
 
-    for (let j = 7; j >= 0; j--) {
-      binario += (charCode & (1 << j)) ? '1' : '0';
-    }
-
-    resultado += binario + ' ';
+  for (let i = 0; i < len; i++) {
+    // Bitmask with 0xFF ensures we stay within the 0-255 range for the lookup table.
+    // This matches the original 8-bit conversion logic.
+    resultados[i] = BINARY_LOOKUP[input.charCodeAt(i) & 0xFF];
   }
 
-  document.getElementById("bin").innerHTML = "El número binario es " + resultado.trim();
-  console.log(resultado.trim());
+  const resultadoFinal = resultados.join(' ');
+  // Bolt ⚡ Optimization: textContent is faster and more secure than innerHTML.
+  document.getElementById("bin").textContent = "El número binario es " + resultadoFinal;
+  console.log(resultadoFinal);
 }
 
 function mostrarBinario1() {
-  let binario = document.getElementById("binario1").value;
-  let caracteres = '';
+  // Note: binario1 element is not present in the current index.html, but maintained for compatibility.
+  const inputElem = document.getElementById("binario1");
+  if (!inputElem) return;
 
-  for (let i = 0; i < binario.length; i += 8) {
-    let byte = binario.substr(i, 8);
-    let charCode = 0;
+  const binario = inputElem.value;
+  const len = binario.length;
+  const caracteresArr = [];
 
-    for (let j = 0; j < byte.length; j++) {
-      charCode = charCode * 2 + (byte[j] === '1' ? 1 : 0);
+  for (let i = 0; i < len; i += 8) {
+    // Bolt ⚡ Optimization: Use substring instead of deprecated substr and parseInt for faster conversion.
+    const byte = binario.substring(i, i + 8);
+    if (byte.length > 0) {
+      caracteresArr.push(String.fromCharCode(parseInt(byte, 2)));
     }
-
-    caracteres += String.fromCharCode(charCode);
   }
 
-  document.getElementById("bin1").innerHTML = "El carácter es " + caracteres;
+  const caracteres = caracteresArr.join('');
+  const outputElem = document.getElementById("bin1");
+  if (outputElem) {
+    outputElem.textContent = "El carácter es " + caracteres;
+  }
   console.log(caracteres);
 }
 
-function mostrarCaracter(){  
-  let binario = document.getElementById("caracter").value;
-  let decimal = parseInt(binario, 2);
-  let caracter = String.fromCharCode(decimal);
-  document.getElementById("bin1").innerHTML = "El carácter es " + caracter;
+function mostrarCaracter() {
+  const binario = document.getElementById("caracter").value;
+  // Bolt ⚡ Optimization: parseInt is efficient for binary string conversion.
+  const decimal = parseInt(binario, 2);
+  const caracter = String.fromCharCode(decimal);
+  document.getElementById("bin1").textContent = "El carácter es " + caracter;
 }
