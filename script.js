@@ -1,44 +1,49 @@
-function mostrarBinario(){
-  let arreglo = document.getElementById("binario").value;
-  let resultado = '';
+// Precomputed binary lookup table for all 256 characters (0-255)
+const BINARY_LOOKUP = Array.from({ length: 256 }, (_, i) => i.toString(2).padStart(8, '0'));
 
-  for (let i = 0; i < arreglo.length; i++) {
-    let charCode = arreglo.charCodeAt(i);
-    let binario = '';
+function mostrarBinario() {
+  const inputElement = document.getElementById("binario");
+  const outputElement = document.getElementById("bin");
+  const text = inputElement.value;
+  const len = text.length;
 
-    for (let j = 7; j >= 0; j--) {
-      binario += (charCode & (1 << j)) ? '1' : '0';
-    }
+  // Pre-allocating array is faster than push() in many engines for large strings
+  const results = new Array(len);
 
-    resultado += binario + ' ';
+  for (let i = 0; i < len; i++) {
+    // We mask with 0xFF to ensure we stay within the lookup table range for standard 8-bit characters
+    results[i] = BINARY_LOOKUP[text.charCodeAt(i) & 0xFF];
   }
 
-  document.getElementById("bin").innerHTML = "El número binario es " + resultado.trim();
-  console.log(resultado.trim());
+  const resultString = results.join(' ');
+  outputElement.textContent = "El número binario es " + resultString;
+  console.log(resultString);
 }
 
 function mostrarBinario1() {
-  let binario = document.getElementById("binario1").value;
-  let caracteres = '';
+  const inputElement = document.getElementById("binario1");
+  const outputElement = document.getElementById("bin1");
+  const binario = inputElement.value;
+  const len = binario.length;
+  const results = [];
 
-  for (let i = 0; i < binario.length; i += 8) {
-    let byte = binario.substr(i, 8);
-    let charCode = 0;
-
-    for (let j = 0; j < byte.length; j++) {
-      charCode = charCode * 2 + (byte[j] === '1' ? 1 : 0);
-    }
-
-    caracteres += String.fromCharCode(charCode);
+  for (let i = 0; i < len; i += 8) {
+    const byte = binario.substring(i, i + 8);
+    if (byte.length === 0) break;
+    // Using parseInt with radix 2 is highly optimized in modern engines
+    results.push(String.fromCharCode(parseInt(byte, 2)));
   }
 
-  document.getElementById("bin1").innerHTML = "El carácter es " + caracteres;
-  console.log(caracteres);
+  const resultString = results.join('');
+  outputElement.textContent = "El carácter es " + resultString;
+  console.log(resultString);
 }
 
-function mostrarCaracter(){  
-  let binario = document.getElementById("caracter").value;
-  let decimal = parseInt(binario, 2);
-  let caracter = String.fromCharCode(decimal);
-  document.getElementById("bin1").innerHTML = "El carácter es " + caracter;
+function mostrarCaracter() {
+  const inputElement = document.getElementById("caracter");
+  const outputElement = document.getElementById("bin1");
+  const binario = inputElement.value;
+  const decimal = parseInt(binario, 2);
+  const caracter = String.fromCharCode(decimal);
+  outputElement.textContent = "El carácter es " + caracter;
 }
