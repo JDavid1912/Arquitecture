@@ -1,44 +1,44 @@
-function mostrarBinario(){
-  let arreglo = document.getElementById("binario").value;
-  let resultado = '';
+// Precompute binary representation for all 256 possible ASCII characters
+const BINARY_LOOKUP = Array.from({ length: 256 }, (_, i) => i.toString(2).padStart(8, '0'));
 
-  for (let i = 0; i < arreglo.length; i++) {
-    let charCode = arreglo.charCodeAt(i);
-    let binario = '';
+function mostrarBinario() {
+  const input = document.getElementById("binario").value;
+  const len = input.length;
+  const resultArr = new Array(len);
 
-    for (let j = 7; j >= 0; j--) {
-      binario += (charCode & (1 << j)) ? '1' : '0';
-    }
-
-    resultado += binario + ' ';
+  for (let i = 0; i < len; i++) {
+    // Optimized: Use precomputed lookup table and avoid bitwise calculations in loop
+    // & 0xFF ensures we stay within the 0-255 range of our lookup table
+    resultArr[i] = BINARY_LOOKUP[input.charCodeAt(i) & 0xFF];
   }
 
-  document.getElementById("bin").innerHTML = "El número binario es " + resultado.trim();
-  console.log(resultado.trim());
+  // Optimized: Use join(' ') instead of string concatenation to avoid O(n^2) complexity
+  const resultado = resultArr.join(' ');
+  document.getElementById("bin").textContent = "El número binario es " + resultado;
+  console.log(resultado);
 }
 
 function mostrarBinario1() {
-  let binario = document.getElementById("binario1").value;
-  let caracteres = '';
+  const binarioStr = document.getElementById("binario1") ? document.getElementById("binario1").value : "";
+  const resultArr = [];
 
-  for (let i = 0; i < binario.length; i += 8) {
-    let byte = binario.substr(i, 8);
-    let charCode = 0;
-
-    for (let j = 0; j < byte.length; j++) {
-      charCode = charCode * 2 + (byte[j] === '1' ? 1 : 0);
-    }
-
-    caracteres += String.fromCharCode(charCode);
+  for (let i = 0; i < binarioStr.length; i += 8) {
+    const byte = binarioStr.substring(i, i + 8);
+    if (byte.length === 0) break;
+    // Optimized: Use parseInt with base 2 instead of manual bit manipulation
+    resultArr.push(String.fromCharCode(parseInt(byte, 2)));
   }
 
-  document.getElementById("bin1").innerHTML = "El carácter es " + caracteres;
+  // Optimized: Use join('') instead of string concatenation
+  const caracteres = resultArr.join('');
+  document.getElementById("bin1").textContent = "El carácter es " + caracteres;
   console.log(caracteres);
 }
 
-function mostrarCaracter(){  
-  let binario = document.getElementById("caracter").value;
-  let decimal = parseInt(binario, 2);
-  let caracter = String.fromCharCode(decimal);
-  document.getElementById("bin1").innerHTML = "El carácter es " + caracter;
+function mostrarCaracter() {
+  const binario = document.getElementById("caracter").value;
+  const decimal = parseInt(binario, 2);
+  const caracter = String.fromCharCode(decimal);
+  // Optimized: Use textContent for better performance and security
+  document.getElementById("bin1").textContent = "El carácter es " + caracter;
 }
