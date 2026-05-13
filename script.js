@@ -1,44 +1,43 @@
+const BINARY_LOOKUP = Array.from({ length: 256 }, (_, i) => i.toString(2).padStart(8, '0'));
+
 function mostrarBinario(){
-  let arreglo = document.getElementById("binario").value;
-  let resultado = '';
+  const input = document.getElementById("binario").value;
+  const len = input.length;
+  const resultado = new Array(len);
 
-  for (let i = 0; i < arreglo.length; i++) {
-    let charCode = arreglo.charCodeAt(i);
-    let binario = '';
-
-    for (let j = 7; j >= 0; j--) {
-      binario += (charCode & (1 << j)) ? '1' : '0';
-    }
-
-    resultado += binario + ' ';
+  for (let i = 0; i < len; i++) {
+    // Mask with 0xFF to ensure we only handle 8-bit characters, matching the original logic
+    const charCode = input.charCodeAt(i) & 0xFF;
+    resultado[i] = BINARY_LOOKUP[charCode];
   }
 
-  document.getElementById("bin").innerHTML = "El número binario es " + resultado.trim();
-  console.log(resultado.trim());
+  const finalString = resultado.join(' ');
+  document.getElementById("bin").textContent = "El número binario es " + finalString;
+  console.log(finalString);
 }
 
 function mostrarBinario1() {
-  let binario = document.getElementById("binario1").value;
-  let caracteres = '';
+  const binario = document.getElementById("binario1").value;
+  const len = binario.length;
+  const results = [];
 
-  for (let i = 0; i < binario.length; i += 8) {
-    let byte = binario.substr(i, 8);
-    let charCode = 0;
+  for (let i = 0; i < len; i += 8) {
+    const byte = binario.substring(i, i + 8);
+    if (byte.length === 0) continue;
 
-    for (let j = 0; j < byte.length; j++) {
-      charCode = charCode * 2 + (byte[j] === '1' ? 1 : 0);
-    }
-
-    caracteres += String.fromCharCode(charCode);
+    // Using parseInt(byte, 2) is more efficient than manual bitwise loop
+    const charCode = parseInt(byte, 2);
+    results.push(String.fromCharCode(charCode));
   }
 
-  document.getElementById("bin1").innerHTML = "El carácter es " + caracteres;
-  console.log(caracteres);
+  const finalString = results.join('');
+  document.getElementById("bin1").textContent = "El carácter es " + finalString;
+  console.log(finalString);
 }
 
 function mostrarCaracter(){  
-  let binario = document.getElementById("caracter").value;
-  let decimal = parseInt(binario, 2);
-  let caracter = String.fromCharCode(decimal);
-  document.getElementById("bin1").innerHTML = "El carácter es " + caracter;
+  const binario = document.getElementById("caracter").value;
+  const decimal = parseInt(binario, 2);
+  const caracter = String.fromCharCode(decimal);
+  document.getElementById("bin1").textContent = "El carácter es " + caracter;
 }
