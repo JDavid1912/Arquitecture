@@ -1,44 +1,63 @@
+// Precompute binary lookup table for 8-bit characters (0-255).
+// This avoids redundant bitwise calculations and padding during conversion.
+const BINARY_TABLE = Array.from({ length: 256 }, (_, i) => i.toString(2).padStart(8, '0'));
+
+/**
+ * Converts the input text to its binary representation.
+ * Optimized with a lookup table and Array.join to handle large inputs efficiently.
+ */
 function mostrarBinario(){
-  let arreglo = document.getElementById("binario").value;
-  let resultado = '';
+  const input = document.getElementById("binario").value;
+  const len = input.length;
 
-  for (let i = 0; i < arreglo.length; i++) {
-    let charCode = arreglo.charCodeAt(i);
-    let binario = '';
+  // Pre-allocating the array for better performance with large strings.
+  const results = new Array(len);
 
-    for (let j = 7; j >= 0; j--) {
-      binario += (charCode & (1 << j)) ? '1' : '0';
-    }
-
-    resultado += binario + ' ';
+  for (let i = 0; i < len; i++) {
+    // Bitmasking with 0xFF ensures the charCode is within the 0-255 range for our table.
+    const charCode = input.charCodeAt(i) & 0xFF;
+    results[i] = BINARY_TABLE[charCode];
   }
 
-  document.getElementById("bin").innerHTML = "El número binario es " + resultado.trim();
-  console.log(resultado.trim());
+  // Using Array.join(' ') is O(n), whereas repeated string concatenation is O(n^2) in many JS engines.
+  const resultado = "El número binario es " + results.join(' ');
+
+  // textContent is faster and more secure than innerHTML for plain text updates.
+  document.getElementById("bin").textContent = resultado;
+  // Large scale console.log can be a performance bottleneck, omitted here for the hot path.
 }
 
+/**
+ * Converts binary input to character representation.
+ * Optimized to avoid redundant lookups and use faster string methods.
+ */
 function mostrarBinario1() {
-  let binario = document.getElementById("binario1").value;
-  let caracteres = '';
+  const binarioInput = document.getElementById("binario1");
+  if (!binarioInput) return;
 
-  for (let i = 0; i < binario.length; i += 8) {
-    let byte = binario.substr(i, 8);
-    let charCode = 0;
+  const binario = binarioInput.value;
+  const len = binario.length;
+  const resultChars = [];
 
-    for (let j = 0; j < byte.length; j++) {
-      charCode = charCode * 2 + (byte[j] === '1' ? 1 : 0);
+  for (let i = 0; i < len; i += 8) {
+    const byte = binario.substring(i, i + 8);
+    const charCode = parseInt(byte, 2);
+    if (!isNaN(charCode)) {
+      resultChars.push(String.fromCharCode(charCode));
     }
-
-    caracteres += String.fromCharCode(charCode);
   }
 
-  document.getElementById("bin1").innerHTML = "El carácter es " + caracteres;
-  console.log(caracteres);
+  const resultado = "El carácter es " + resultChars.join('');
+  document.getElementById("bin1").textContent = resultado;
 }
 
+/**
+ * Converts a single binary string to its character representation.
+ */
 function mostrarCaracter(){  
-  let binario = document.getElementById("caracter").value;
-  let decimal = parseInt(binario, 2);
-  let caracter = String.fromCharCode(decimal);
-  document.getElementById("bin1").innerHTML = "El carácter es " + caracter;
+  const binario = document.getElementById("caracter").value;
+  const decimal = parseInt(binario, 2);
+  if (isNaN(decimal)) return;
+  const caracter = String.fromCharCode(decimal);
+  document.getElementById("bin1").textContent = "El carácter es " + caracter;
 }
