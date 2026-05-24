@@ -1,44 +1,52 @@
-function mostrarBinario(){
-  let arreglo = document.getElementById("binario").value;
-  let resultado = '';
+// Precomputed lookup table for 8-bit binary strings (0-255).
+// This avoids repeated bitwise operations and string padding during conversion.
+const BYTE_TO_BIN = Array.from({ length: 256 }, (_, i) => i.toString(2).padStart(8, '0'));
 
-  for (let i = 0; i < arreglo.length; i++) {
-    let charCode = arreglo.charCodeAt(i);
-    let binario = '';
+// Precomputed reverse lookup table for 8-bit binary to character conversion.
+// This significantly speeds up binary-to-text decoding by avoiding repeated parsing in hot paths.
+const BIN_TO_CHAR = Object.fromEntries(BYTE_TO_BIN.map((bin, i) => [bin, String.fromCharCode(i)]));
 
-    for (let j = 7; j >= 0; j--) {
-      binario += (charCode & (1 << j)) ? '1' : '0';
-    }
+function mostrarBinario() {
+  const input = document.getElementById("binario").value;
+  const len = input.length;
+  // Pre-allocate array to avoid memory overhead from frequent resizing during large string builds.
+  const resultArr = new Array(len);
 
-    resultado += binario + ' ';
+  for (let i = 0; i < len; i++) {
+    // Bitmask with 0xFF ensures the character code is within the 0-255 range for our lookup table.
+    resultArr[i] = BYTE_TO_BIN[input.charCodeAt(i) & 0xFF];
   }
 
-  document.getElementById("bin").innerHTML = "El número binario es " + resultado.trim();
-  console.log(resultado.trim());
+  // Join once at the end to avoid O(n^2) performance hit from repeated string concatenation.
+  const finalResult = resultArr.join(' ');
+  // textContent is faster and more secure than innerHTML for updating text-only content.
+  document.getElementById("bin").textContent = "El número binario es " + finalResult;
+  console.log(finalResult);
 }
 
 function mostrarBinario1() {
-  let binario = document.getElementById("binario1").value;
+  const binario = document.getElementById("binario1").value;
   let caracteres = '';
 
+  // Process input in 8-bit chunks to leverage precomputed character mapping.
   for (let i = 0; i < binario.length; i += 8) {
-    let byte = binario.substr(i, 8);
-    let charCode = 0;
-
-    for (let j = 0; j < byte.length; j++) {
-      charCode = charCode * 2 + (byte[j] === '1' ? 1 : 0);
+    const byte = binario.substring(i, i + 8);
+    // Use lookup table for complete bytes, fallback to parseInt for trailing bits if any.
+    if (byte.length === 8) {
+      caracteres += BIN_TO_CHAR[byte] || String.fromCharCode(parseInt(byte, 2));
+    } else {
+      caracteres += String.fromCharCode(parseInt(byte, 2));
     }
-
-    caracteres += String.fromCharCode(charCode);
   }
 
-  document.getElementById("bin1").innerHTML = "El carácter es " + caracteres;
+  document.getElementById("bin1").textContent = "El carácter es " + caracteres;
   console.log(caracteres);
 }
 
-function mostrarCaracter(){  
-  let binario = document.getElementById("caracter").value;
-  let decimal = parseInt(binario, 2);
-  let caracter = String.fromCharCode(decimal);
-  document.getElementById("bin1").innerHTML = "El carácter es " + caracter;
+function mostrarCaracter() {
+  const binario = document.getElementById("caracter").value;
+  const decimal = parseInt(binario, 2);
+  const caracter = String.fromCharCode(decimal);
+  // Consistent use of textContent for DOM updates.
+  document.getElementById("bin1").textContent = "El carácter es " + caracter;
 }
