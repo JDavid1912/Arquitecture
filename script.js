@@ -1,44 +1,58 @@
+// Precompute lookup tables for performance
+const BINARY_TABLE = Array.from({ length: 256 }, (_, i) => i.toString(2).padStart(8, '0'));
+const REVERSE_BINARY_TABLE = Object.fromEntries(BINARY_TABLE.map((bin, i) => [bin, String.fromCharCode(i)]));
+
+/**
+ * Converts text input to a space-separated binary string.
+ * Optimization: Uses a precomputed lookup table and Array.join() for O(n) performance.
+ */
 function mostrarBinario(){
-  let arreglo = document.getElementById("binario").value;
-  let resultado = '';
+  const input = document.getElementById("binario").value;
+  const len = input.length;
+  const result = new Array(len);
 
-  for (let i = 0; i < arreglo.length; i++) {
-    let charCode = arreglo.charCodeAt(i);
-    let binario = '';
-
-    for (let j = 7; j >= 0; j--) {
-      binario += (charCode & (1 << j)) ? '1' : '0';
-    }
-
-    resultado += binario + ' ';
+  for (let i = 0; i < len; i++) {
+    // Bitmasking with 0xFF ensures we stay within the 0-255 range for the lookup table.
+    // This matches the original behavior of only processing the lower 8 bits.
+    result[i] = BINARY_TABLE[input.charCodeAt(i) & 0xFF];
   }
 
-  document.getElementById("bin").innerHTML = "El número binario es " + resultado.trim();
-  console.log(resultado.trim());
+  const finalResult = result.join(' ');
+  // textContent is faster and safer than innerHTML as we are not injecting any HTML.
+  document.getElementById("bin").textContent = "El número binario es " + finalResult;
+  console.log(finalResult);
 }
 
+/**
+ * Converts a binary string to text characters.
+ * Optimization: Uses a precomputed reverse lookup table and processes in 8-bit chunks.
+ */
 function mostrarBinario1() {
-  let binario = document.getElementById("binario1").value;
-  let caracteres = '';
+  const binario = document.getElementById("binario1").value;
+  const len = binario.length;
+  const result = [];
 
-  for (let i = 0; i < binario.length; i += 8) {
-    let byte = binario.substr(i, 8);
-    let charCode = 0;
-
-    for (let j = 0; j < byte.length; j++) {
-      charCode = charCode * 2 + (byte[j] === '1' ? 1 : 0);
+  for (let i = 0; i < len; i += 8) {
+    const byte = binario.slice(i, i + 8);
+    // Use lookup table for full 8-bit bytes, fallback to parseInt for incomplete chunks.
+    if (byte.length === 8) {
+      result.push(REVERSE_BINARY_TABLE[byte] || String.fromCharCode(parseInt(byte, 2)));
+    } else {
+      result.push(String.fromCharCode(parseInt(byte, 2)));
     }
-
-    caracteres += String.fromCharCode(charCode);
   }
 
-  document.getElementById("bin1").innerHTML = "El carácter es " + caracteres;
+  const caracteres = result.join('');
+  document.getElementById("bin1").textContent = "El carácter es " + caracteres;
   console.log(caracteres);
 }
 
+/**
+ * Converts a single binary number to a character.
+ */
 function mostrarCaracter(){  
-  let binario = document.getElementById("caracter").value;
-  let decimal = parseInt(binario, 2);
-  let caracter = String.fromCharCode(decimal);
-  document.getElementById("bin1").innerHTML = "El carácter es " + caracter;
+  const binario = document.getElementById("caracter").value;
+  const decimal = parseInt(binario, 2);
+  const caracter = String.fromCharCode(decimal);
+  document.getElementById("bin1").textContent = "El carácter es " + caracter;
 }
