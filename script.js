@@ -1,20 +1,23 @@
+// Precompute binary lookup table for performance (0-255)
+const binaryLookup = Array.from({ length: 256 }, (_, i) => i.toString(2).padStart(8, '0'));
+
 function mostrarBinario(){
   let arreglo = document.getElementById("binario").value;
-  let resultado = '';
+  let len = arreglo.length;
+  // Use a pre-allocated array for better performance with large inputs
+  let resultadoArr = new Array(len);
 
-  for (let i = 0; i < arreglo.length; i++) {
-    let charCode = arreglo.charCodeAt(i);
-    let binario = '';
-
-    for (let j = 7; j >= 0; j--) {
-      binario += (charCode & (1 << j)) ? '1' : '0';
-    }
-
-    resultado += binario + ' ';
+  for (let i = 0; i < len; i++) {
+    // charCodeAt returns UTF-16 code unit, masking with 0xFF for 8-bit lookup
+    resultadoArr[i] = binaryLookup[arreglo.charCodeAt(i) & 0xFF];
   }
 
-  document.getElementById("bin").innerHTML = "El número binario es " + resultado.trim();
-  console.log(resultado.trim());
+  // join() is O(n) while string concatenation in loop is O(n^2)
+  let resultado = resultadoArr.join(' ');
+
+  // textContent is faster and more secure than innerHTML
+  document.getElementById("bin").textContent = "El número binario es " + resultado;
+  console.log(resultado);
 }
 
 function mostrarBinario1() {
