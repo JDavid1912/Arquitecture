@@ -1,44 +1,60 @@
+// Precompute binary lookup table for 8-bit characters (0-255)
+// This avoids bitwise operations and string concatenation in the hot path.
+const binaryLookup = Array.from({ length: 256 }, (_, i) => i.toString(2).padStart(8, '0'));
+
 function mostrarBinario(){
-  let arreglo = document.getElementById("binario").value;
-  let resultado = '';
+  const input = document.getElementById("binario").value;
+  const len = input.length;
 
-  for (let i = 0; i < arreglo.length; i++) {
-    let charCode = arreglo.charCodeAt(i);
-    let binario = '';
+  // Use an array to store binary strings and join them at the end.
+  // This is significantly faster than repeated string concatenation (O(n^2)).
+  const resultadoArray = new Array(len);
 
-    for (let j = 7; j >= 0; j--) {
-      binario += (charCode & (1 << j)) ? '1' : '0';
-    }
-
-    resultado += binario + ' ';
+  for (let i = 0; i < len; i++) {
+    // Bitmasking with 0xFF ensures we stay within the 0-255 range for the lookup table.
+    const charCode = input.charCodeAt(i) & 0xFF;
+    resultadoArray[i] = binaryLookup[charCode];
   }
 
-  document.getElementById("bin").innerHTML = "El número binario es " + resultado.trim();
-  console.log(resultado.trim());
+  const finalResult = resultadoArray.join(' ');
+
+  // Using textContent is more performant and secure than innerHTML.
+  document.getElementById("bin").textContent = "El número binario es " + finalResult;
+  console.log(finalResult);
 }
 
 function mostrarBinario1() {
-  let binario = document.getElementById("binario1").value;
-  let caracteres = '';
+  const element = document.getElementById("binario1");
+  if (!element) return; // Guard against missing element in HTML
 
-  for (let i = 0; i < binario.length; i += 8) {
-    let byte = binario.substr(i, 8);
-    let charCode = 0;
+  const binario = element.value;
+  const len = binario.length;
+  // Use ceil to handle any trailing bits (regression safety)
+  const resultLen = Math.ceil(len / 8);
+  const caracteresArray = new Array(resultLen);
 
-    for (let j = 0; j < byte.length; j++) {
-      charCode = charCode * 2 + (byte[j] === '1' ? 1 : 0);
+  for (let i = 0; i < resultLen; i++) {
+    // Replacing deprecated substr with slice
+    const byte = binario.slice(i * 8, i * 8 + 8);
+    // Native parseInt(byte, 2) is highly optimized in modern JS engines.
+    // It also correctly handles partial bytes at the end of the string.
+    const charCode = parseInt(byte, 2);
+    if (!isNaN(charCode)) {
+      caracteresArray[i] = String.fromCharCode(charCode);
+    } else {
+      caracteresArray[i] = '';
     }
-
-    caracteres += String.fromCharCode(charCode);
   }
 
-  document.getElementById("bin1").innerHTML = "El carácter es " + caracteres;
-  console.log(caracteres);
+  const finalString = caracteresArray.join('');
+  document.getElementById("bin1").textContent = "El carácter es " + finalString;
+  console.log(finalString);
 }
 
 function mostrarCaracter(){  
-  let binario = document.getElementById("caracter").value;
-  let decimal = parseInt(binario, 2);
-  let caracter = String.fromCharCode(decimal);
-  document.getElementById("bin1").innerHTML = "El carácter es " + caracter;
+  const binario = document.getElementById("caracter").value;
+  const decimal = parseInt(binario, 2);
+  const caracter = String.fromCharCode(decimal);
+  // Consistent use of textContent for DOM updates.
+  document.getElementById("bin1").textContent = "El carácter es " + caracter;
 }
