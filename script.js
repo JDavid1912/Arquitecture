@@ -1,20 +1,24 @@
+// Precomputed lookup table for 8-bit binary strings (0-255).
+// This provides O(1) retrieval and avoids repeated bitwise calculations.
+const binaryLookup = Array.from({ length: 256 }, (_, i) => i.toString(2).padStart(8, '0'));
+
 function mostrarBinario(){
-  let arreglo = document.getElementById("binario").value;
-  let resultado = '';
+  const input = document.getElementById("binario").value;
+  const len = input.length;
 
-  for (let i = 0; i < arreglo.length; i++) {
-    let charCode = arreglo.charCodeAt(i);
-    let binario = '';
+  // Pre-allocating the array avoids the O(n^2) performance hit of repeated string concatenation.
+  const result = new Array(len);
 
-    for (let j = 7; j >= 0; j--) {
-      binario += (charCode & (1 << j)) ? '1' : '0';
-    }
-
-    resultado += binario + ' ';
+  for (let i = 0; i < len; i++) {
+    // Use & 0xFF to ensure the charCode is within the 0-255 range of our lookup table.
+    result[i] = binaryLookup[input.charCodeAt(i) & 0xFF];
   }
 
-  document.getElementById("bin").innerHTML = "El número binario es " + resultado.trim();
-  console.log(resultado.trim());
+  const finalResult = result.join(' ');
+
+  // textContent is preferred over innerHTML for better performance and security (XSS prevention).
+  document.getElementById("bin").textContent = "El número binario es " + finalResult;
+  console.log(finalResult);
 }
 
 function mostrarBinario1() {
@@ -40,5 +44,6 @@ function mostrarCaracter(){
   let binario = document.getElementById("caracter").value;
   let decimal = parseInt(binario, 2);
   let caracter = String.fromCharCode(decimal);
-  document.getElementById("bin1").innerHTML = "El carácter es " + caracter;
+  // Consistent use of textContent for DOM updates.
+  document.getElementById("bin1").textContent = "El carácter es " + caracter;
 }
