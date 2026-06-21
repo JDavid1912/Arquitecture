@@ -1,44 +1,47 @@
-function mostrarBinario(){
-  let arreglo = document.getElementById("binario").value;
-  let resultado = '';
+// Precompute lookup table for 8-bit binary strings to speed up conversion
+const binaryLookup = Array.from({ length: 256 }, (_, i) => i.toString(2).padStart(8, '0'));
 
-  for (let i = 0; i < arreglo.length; i++) {
-    let charCode = arreglo.charCodeAt(i);
-    let binario = '';
+function mostrarBinario() {
+  const input = document.getElementById("binario").value;
+  const len = input.length;
 
-    for (let j = 7; j >= 0; j--) {
-      binario += (charCode & (1 << j)) ? '1' : '0';
-    }
-
-    resultado += binario + ' ';
+  if (len === 0) {
+    document.getElementById("bin").textContent = "El número binario es ";
+    return;
   }
 
-  document.getElementById("bin").innerHTML = "El número binario es " + resultado.trim();
-  console.log(resultado.trim());
+  // Using an array and join is much faster than string concatenation in a loop
+  const result = new Array(len);
+  for (let i = 0; i < len; i++) {
+    // Mask with 0xFF to ensure we only look up 8-bit values, matching original behavior
+    result[i] = binaryLookup[input.charCodeAt(i) & 0xFF];
+  }
+
+  const finalResult = result.join(' ');
+  // textContent is faster and more secure than innerHTML
+  document.getElementById("bin").textContent = "El número binario es " + finalResult;
+  console.log(finalResult);
 }
 
 function mostrarBinario1() {
-  let binario = document.getElementById("binario1").value;
-  let caracteres = '';
+  const binario = document.getElementById("binario1").value;
+  const len = binario.length;
+  const result = [];
 
-  for (let i = 0; i < binario.length; i += 8) {
-    let byte = binario.substr(i, 8);
-    let charCode = 0;
-
-    for (let j = 0; j < byte.length; j++) {
-      charCode = charCode * 2 + (byte[j] === '1' ? 1 : 0);
-    }
-
-    caracteres += String.fromCharCode(charCode);
+  for (let i = 0; i < len; i += 8) {
+    const byte = binario.slice(i, i + 8);
+    // Use parseInt for native binary to decimal conversion
+    result.push(String.fromCharCode(parseInt(byte, 2)));
   }
 
-  document.getElementById("bin1").innerHTML = "El carácter es " + caracteres;
-  console.log(caracteres);
+  const finalResult = result.join('');
+  document.getElementById("bin1").textContent = "El carácter es " + finalResult;
+  console.log(finalResult);
 }
 
-function mostrarCaracter(){  
-  let binario = document.getElementById("caracter").value;
-  let decimal = parseInt(binario, 2);
-  let caracter = String.fromCharCode(decimal);
-  document.getElementById("bin1").innerHTML = "El carácter es " + caracter;
+function mostrarCaracter() {
+  const binario = document.getElementById("caracter").value;
+  const decimal = parseInt(binario, 2);
+  const caracter = String.fromCharCode(decimal);
+  document.getElementById("bin1").textContent = "El carácter es " + caracter;
 }
