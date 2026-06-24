@@ -1,0 +1,3 @@
+## 2025-05-15 - Optimizing Character-to-Binary Conversion
+**Learning:** In JavaScript, repeated string concatenation in loops can lead to $O(N^2)$ time complexity for large inputs due to the immutability of strings. Using a pre-allocated array and `Array.join()` is significantly more efficient for large-scale string construction. Additionally, precomputing results in a lookup table (e.g., 8-bit binary strings for 0-255) eliminates redundant calculations and bitwise operations in the hot path.
+**Action:** Always prefer array joining for building large strings in loops and evaluate if expensive computations can be pre-calculated or memoized.
