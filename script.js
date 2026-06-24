@@ -1,20 +1,30 @@
+// Precompute binary lookup table for performance (0-255) to avoid redundant calculations
+const binaryLookup = Array.from({ length: 256 }, (_, i) => i.toString(2).padStart(8, '0'));
+
+/**
+ * Optimized character-to-binary conversion.
+ * Uses a lookup table and array joining to achieve O(n) performance,
+ * avoiding the O(n^2) bottleneck of repeated string concatenation.
+ */
 function mostrarBinario(){
-  let arreglo = document.getElementById("binario").value;
-  let resultado = '';
+  const input = document.getElementById("binario").value;
+  const len = input.length;
 
-  for (let i = 0; i < arreglo.length; i++) {
-    let charCode = arreglo.charCodeAt(i);
-    let binario = '';
+  // Pre-allocate array for better performance than repeated string concatenation
+  const binaryArray = new Array(len);
 
-    for (let j = 7; j >= 0; j--) {
-      binario += (charCode & (1 << j)) ? '1' : '0';
-    }
-
-    resultado += binario + ' ';
+  for (let i = 0; i < len; i++) {
+    // Bitmask with 0xFF to ensure the char code is within 0-255 range for the lookup table.
+    // This replicates the original code's 8-bit truncation behavior.
+    binaryArray[i] = binaryLookup[input.charCodeAt(i) & 0xFF];
   }
 
-  document.getElementById("bin").innerHTML = "El número binario es " + resultado.trim();
-  console.log(resultado.trim());
+  // Use Array.join for efficient string construction
+  const resultado = binaryArray.join(' ');
+
+  // Use textContent instead of innerHTML for better performance and security
+  document.getElementById("bin").textContent = "El número binario es " + resultado;
+  console.log(resultado);
 }
 
 function mostrarBinario1() {
