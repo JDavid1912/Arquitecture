@@ -1,20 +1,30 @@
-function mostrarBinario(){
-  let arreglo = document.getElementById("binario").value;
-  let resultado = '';
+// Precomputed lookup table for 8-bit binary strings (0-255)
+// This avoids repeated bitwise operations and string building for each character.
+const binaryLookup = Array.from({ length: 256 }, (_, i) => i.toString(2).padStart(8, '0'));
 
-  for (let i = 0; i < arreglo.length; i++) {
-    let charCode = arreglo.charCodeAt(i);
-    let binario = '';
-
-    for (let j = 7; j >= 0; j--) {
-      binario += (charCode & (1 << j)) ? '1' : '0';
-    }
-
-    resultado += binario + ' ';
+function mostrarBinario() {
+  const input = document.getElementById("binario").value;
+  if (!input) {
+    document.getElementById("bin").textContent = "El número binario es ";
+    return;
   }
 
-  document.getElementById("bin").innerHTML = "El número binario es " + resultado.trim();
-  console.log(resultado.trim());
+  const len = input.length;
+  // Performance: Pre-allocating an array and using .join(' ') is much faster than
+  // O(n^2) string concatenation in a loop for large inputs.
+  const resultArr = new Array(len);
+
+  for (let i = 0; i < len; i++) {
+    // Masking with 0xFF ensures we only take the last 8 bits, matching original behavior
+    // and allowing us to use the O(1) lookup table.
+    resultArr[i] = binaryLookup[input.charCodeAt(i) & 0xFF];
+  }
+
+  const finalResult = resultArr.join(' ');
+
+  // Performance & Security: textContent is faster than innerHTML as it skips HTML parsing.
+  document.getElementById("bin").textContent = "El número binario es " + finalResult;
+  console.log(finalResult);
 }
 
 function mostrarBinario1() {
