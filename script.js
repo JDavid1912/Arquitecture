@@ -1,20 +1,33 @@
+// Precomputed lookup table for 8-bit binary strings (0-255)
+// This avoids repeated toString(2) and padStart calls during conversion.
+const binaryLookup = new Array(256);
+for (let i = 0; i < 256; i++) {
+  binaryLookup[i] = i.toString(2).padStart(8, '0');
+}
+
 function mostrarBinario(){
   let arreglo = document.getElementById("binario").value;
-  let resultado = '';
-
-  for (let i = 0; i < arreglo.length; i++) {
-    let charCode = arreglo.charCodeAt(i);
-    let binario = '';
-
-    for (let j = 7; j >= 0; j--) {
-      binario += (charCode & (1 << j)) ? '1' : '0';
-    }
-
-    resultado += binario + ' ';
+  if (!arreglo) {
+    document.getElementById("bin").textContent = "El número binario es ";
+    return;
   }
 
-  document.getElementById("bin").innerHTML = "El número binario es " + resultado.trim();
-  console.log(resultado.trim());
+  let len = arreglo.length;
+  let result = new Array(len);
+
+  for (let i = 0; i < len; i++) {
+    // We use & 0xFF to ensure we stay within the 0-255 range of our lookup table.
+    // This also handles non-ASCII characters by truncating them to their last 8 bits,
+    // matching the behavior of the original bitwise implementation.
+    let charCode = arreglo.charCodeAt(i) & 0xFF;
+    result[i] = binaryLookup[charCode];
+  }
+
+  const finalResult = result.join(' ');
+
+  // Use textContent for better performance and security than innerHTML
+  document.getElementById("bin").textContent = "El número binario es " + finalResult;
+  console.log(finalResult);
 }
 
 function mostrarBinario1() {
