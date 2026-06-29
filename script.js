@@ -1,20 +1,40 @@
-function mostrarBinario(){
-  let arreglo = document.getElementById("binario").value;
-  let resultado = '';
+/**
+ * Precomputed lookup table for 8-bit binary strings (0-255).
+ * Initializing this once avoids redundant bitwise calculations during conversion.
+ */
+const binaryLookup = new Array(256);
+for (let i = 0; i < 256; i++) {
+  binaryLookup[i] = i.toString(2).padStart(8, '0');
+}
 
-  for (let i = 0; i < arreglo.length; i++) {
-    let charCode = arreglo.charCodeAt(i);
-    let binario = '';
+/**
+ * Converts the input text to its binary representation.
+ *
+ * Performance optimizations:
+ * 1. Uses a precomputed lookup table for O(1) binary string retrieval.
+ * 2. Pre-allocates an array and uses Array.join(' ') to avoid O(n^2) string concatenation.
+ * 3. Uses textContent instead of innerHTML for faster DOM updates and better security.
+ */
+function mostrarBinario() {
+  const input = document.getElementById("binario").value;
+  const len = input.length;
 
-    for (let j = 7; j >= 0; j--) {
-      binario += (charCode & (1 << j)) ? '1' : '0';
-    }
-
-    resultado += binario + ' ';
+  if (len === 0) {
+    document.getElementById("bin").textContent = "El número binario es ";
+    return;
   }
 
-  document.getElementById("bin").innerHTML = "El número binario es " + resultado.trim();
-  console.log(resultado.trim());
+  const results = new Array(len);
+
+  for (let i = 0; i < len; i++) {
+    // We use & 0xFF to ensure we only deal with 8-bit values, matching original behavior for non-ASCII
+    const charCode = input.charCodeAt(i) & 0xFF;
+    results[i] = binaryLookup[charCode];
+  }
+
+  const finalString = results.join(' ');
+  document.getElementById("bin").textContent = "El número binario es " + finalString;
+  console.log(finalString);
 }
 
 function mostrarBinario1() {
