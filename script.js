@@ -1,20 +1,33 @@
-function mostrarBinario(){
-  let arreglo = document.getElementById("binario").value;
-  let resultado = '';
+// Precompute lookup table for 8-bit binary representation (0-255)
+// This avoids repeated bitwise operations for every character in every call.
+const binaryLookup = new Array(256);
+for (let i = 0; i < 256; i++) {
+  binaryLookup[i] = i.toString(2).padStart(8, '0');
+}
 
-  for (let i = 0; i < arreglo.length; i++) {
-    let charCode = arreglo.charCodeAt(i);
-    let binario = '';
-
-    for (let j = 7; j >= 0; j--) {
-      binario += (charCode & (1 << j)) ? '1' : '0';
-    }
-
-    resultado += binario + ' ';
+function mostrarBinario() {
+  const input = document.getElementById("binario").value;
+  if (!input) {
+    document.getElementById("bin").textContent = "El número binario es ";
+    return;
   }
 
-  document.getElementById("bin").innerHTML = "El número binario es " + resultado.trim();
-  console.log(resultado.trim());
+  const len = input.length;
+  const resultArr = new Array(len);
+
+  // Optimization: Use precomputed lookup table and array joining for O(n) complexity.
+  // Original version used nested loops and string concatenation, which can be O(n^2).
+  for (let i = 0; i < len; i++) {
+    const charCode = input.charCodeAt(i);
+    // Mimic original behavior by masking to 8 bits
+    resultArr[i] = binaryLookup[charCode & 0xFF];
+  }
+
+  const finalString = resultArr.join(' ');
+
+  // Optimization: Use textContent instead of innerHTML for better performance and security.
+  document.getElementById("bin").textContent = "El número binario es " + finalString;
+  console.log(finalString);
 }
 
 function mostrarBinario1() {
@@ -36,7 +49,7 @@ function mostrarBinario1() {
   console.log(caracteres);
 }
 
-function mostrarCaracter(){  
+function mostrarCaracter() {
   let binario = document.getElementById("caracter").value;
   let decimal = parseInt(binario, 2);
   let caracter = String.fromCharCode(decimal);
