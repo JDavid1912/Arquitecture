@@ -1,20 +1,37 @@
+// Precompute binary lookup table for performance (0-255)
+const binaryLookup = new Array(256);
+for (let i = 0; i < 256; i++) {
+  binaryLookup[i] = i.toString(2).padStart(8, '0');
+}
+
+/**
+ * Converts text input to its binary representation.
+ * Optimized with a lookup table and pre-allocated array join for O(n) performance.
+ */
 function mostrarBinario(){
-  let arreglo = document.getElementById("binario").value;
-  let resultado = '';
+  const input = document.getElementById("binario").value;
+  const len = input.length;
 
-  for (let i = 0; i < arreglo.length; i++) {
-    let charCode = arreglo.charCodeAt(i);
-    let binario = '';
-
-    for (let j = 7; j >= 0; j--) {
-      binario += (charCode & (1 << j)) ? '1' : '0';
-    }
-
-    resultado += binario + ' ';
+  // Early return for empty input
+  if (len === 0) {
+    document.getElementById("bin").textContent = "El número binario es ";
+    return;
   }
 
-  document.getElementById("bin").innerHTML = "El número binario es " + resultado.trim();
-  console.log(resultado.trim());
+  // Pre-allocate array for efficiency
+  const resultArr = new Array(len);
+
+  for (let i = 0; i < len; i++) {
+    // Bitmasking with 0xFF ensures we only process the lower 8 bits,
+    // consistent with the original 8-bit conversion logic.
+    resultArr[i] = binaryLookup[input.charCodeAt(i) & 0xFF];
+  }
+
+  const resultado = resultArr.join(' ');
+
+  // Use textContent instead of innerHTML for better performance and security
+  document.getElementById("bin").textContent = "El número binario es " + resultado;
+  console.log(resultado);
 }
 
 function mostrarBinario1() {
