@@ -1,20 +1,31 @@
+// Global lookup table for 8-bit binary representations of numbers 0-255
+// This provides O(1) retrieval during conversion
+const BINARY_LOOKUP = Array.from({ length: 256 }, (_, i) => i.toString(2).padStart(8, '0'));
+
 function mostrarBinario(){
-  let arreglo = document.getElementById("binario").value;
-  let resultado = '';
+  const inputElement = document.getElementById("binario");
+  const text = inputElement.value;
+  const len = text.length;
 
-  for (let i = 0; i < arreglo.length; i++) {
-    let charCode = arreglo.charCodeAt(i);
-    let binario = '';
-
-    for (let j = 7; j >= 0; j--) {
-      binario += (charCode & (1 << j)) ? '1' : '0';
-    }
-
-    resultado += binario + ' ';
+  if (len === 0) {
+    document.getElementById("bin").textContent = "El número binario es ";
+    return;
   }
 
-  document.getElementById("bin").innerHTML = "El número binario es " + resultado.trim();
-  console.log(resultado.trim());
+  // Pre-allocate array for better performance when building large strings
+  let binaryResults = new Array(len);
+
+  for (let i = 0; i < len; i++) {
+    // text.charCodeAt(i) & 0xFF ensures we stay within the 0-255 range for the lookup table
+    binaryResults[i] = BINARY_LOOKUP[text.charCodeAt(i) & 0xFF];
+  }
+
+  // join(' ') is significantly faster than repeated string concatenation (O(n) vs O(n^2))
+  const finalResult = binaryResults.join(' ');
+
+  // textContent is safer and faster than innerHTML for simple text updates
+  document.getElementById("bin").textContent = "El número binario es " + finalResult;
+  console.log(finalResult);
 }
 
 function mostrarBinario1() {
