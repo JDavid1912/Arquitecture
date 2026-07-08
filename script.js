@@ -1,20 +1,30 @@
+// Pre-calculated lookup table for 8-bit binary strings (0-255)
+// This avoids redundant bitwise operations and toString calls during conversion.
+const BINARY_LOOKUP = Array.from({ length: 256 }, (_, i) => i.toString(2).padStart(8, '0'));
+
 function mostrarBinario(){
-  let arreglo = document.getElementById("binario").value;
-  let resultado = '';
+  const input = document.getElementById("binario").value;
+  const len = input.length;
 
-  for (let i = 0; i < arreglo.length; i++) {
-    let charCode = arreglo.charCodeAt(i);
-    let binario = '';
-
-    for (let j = 7; j >= 0; j--) {
-      binario += (charCode & (1 << j)) ? '1' : '0';
-    }
-
-    resultado += binario + ' ';
+  if (len === 0) {
+    document.getElementById("bin").textContent = "El número binario es ";
+    return;
   }
 
-  document.getElementById("bin").innerHTML = "El número binario es " + resultado.trim();
-  console.log(resultado.trim());
+  // Use a pre-allocated array and join(' ') for O(n) string building,
+  // avoiding the O(n^2) cost of repeated string concatenation.
+  const resultados = new Array(len);
+
+  for (let i = 0; i < len; i++) {
+    // charCodeAt(i) & 0xFF ensures we stay within the 0-255 lookup table
+    // while matching the 8-bit output behavior of the original implementation.
+    resultados[i] = BINARY_LOOKUP[input.charCodeAt(i) & 0xFF];
+  }
+
+  const resultado = resultados.join(' ');
+  // textContent is faster and safer than innerHTML for simple text updates.
+  document.getElementById("bin").textContent = "El número binario es " + resultado;
+  console.log(resultado);
 }
 
 function mostrarBinario1() {
