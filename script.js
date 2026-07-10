@@ -1,20 +1,39 @@
+// Global binary lookup table for characters 0-255 to avoid redundant bitwise calculations
+const binaryLookup = new Array(256);
+for (let i = 0; i < 256; i++) {
+  binaryLookup[i] = i.toString(2).padStart(8, '0');
+}
+
+/**
+ * Optimizes character-to-binary conversion.
+ * Bottlenecks addressed:
+ * 1. Replaced nested bitwise loop with O(1) lookup table.
+ * 2. Replaced O(n^2) string concatenation with pre-allocated array and join().
+ * 3. Replaced innerHTML with textContent for performance and security.
+ */
 function mostrarBinario(){
-  let arreglo = document.getElementById("binario").value;
-  let resultado = '';
+  const input = document.getElementById("binario").value;
+  const len = input.length;
 
-  for (let i = 0; i < arreglo.length; i++) {
-    let charCode = arreglo.charCodeAt(i);
-    let binario = '';
-
-    for (let j = 7; j >= 0; j--) {
-      binario += (charCode & (1 << j)) ? '1' : '0';
-    }
-
-    resultado += binario + ' ';
+  // Early return if input is empty to match original behavior
+  if (len === 0) {
+    document.getElementById("bin").textContent = "El número binario es ";
+    console.log("");
+    return;
   }
 
-  document.getElementById("bin").innerHTML = "El número binario es " + resultado.trim();
-  console.log(resultado.trim());
+  // Pre-allocate array for better performance with large inputs
+  const resultado = new Array(len);
+
+  for (let i = 0; i < len; i++) {
+    // Original code effectively truncated to 8 bits by only looping 7 down to 0
+    const charCode = input.charCodeAt(i) & 0xFF;
+    resultado[i] = binaryLookup[charCode];
+  }
+
+  // join(' ') is significantly faster than repeated string concatenation
+  document.getElementById("bin").textContent = "El número binario es " + resultado.join(' ');
+  console.log(resultado.join(' '));
 }
 
 function mostrarBinario1() {
