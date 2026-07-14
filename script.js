@@ -1,20 +1,25 @@
+// Pre-computed lookup table for 8-bit binary strings (0-255)
+const binaryLookup = Array.from({ length: 256 }, (_, i) => i.toString(2).padStart(8, '0'));
+
 function mostrarBinario(){
-  let arreglo = document.getElementById("binario").value;
-  let resultado = '';
-
-  for (let i = 0; i < arreglo.length; i++) {
-    let charCode = arreglo.charCodeAt(i);
-    let binario = '';
-
-    for (let j = 7; j >= 0; j--) {
-      binario += (charCode & (1 << j)) ? '1' : '0';
-    }
-
-    resultado += binario + ' ';
+  const input = document.getElementById("binario").value;
+  if (!input) {
+    document.getElementById("bin").textContent = "El número binario es ";
+    return;
   }
 
-  document.getElementById("bin").innerHTML = "El número binario es " + resultado.trim();
-  console.log(resultado.trim());
+  // Optimization: Pre-allocating the array and using a lookup table for faster conversion
+  const result = new Array(input.length);
+
+  for (let i = 0; i < input.length; i++) {
+    // Bitmasking to 0xFF ensures we stay within the lookup table bounds (8-bit)
+    result[i] = binaryLookup[input.charCodeAt(i) & 0xFF];
+  }
+
+  const finalString = result.join(' ');
+  // Optimization: Using textContent is faster than innerHTML and avoids unnecessary HTML parsing
+  document.getElementById("bin").textContent = "El número binario es " + finalString;
+  console.log(finalString);
 }
 
 function mostrarBinario1() {
