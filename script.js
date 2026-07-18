@@ -1,20 +1,38 @@
+// Global pre-computed lookup table for 8-bit binary representation of character codes (0-255).
+// This achieves O(1) binary string retrieval during translation and avoids re-computation.
+const binaryLookup = new Array(256);
+for (let i = 0; i < 256; i++) {
+  let bin = '';
+  for (let j = 7; j >= 0; j--) {
+    bin += (i & (1 << j)) ? '1' : '0';
+  }
+  binaryLookup[i] = bin;
+}
+
 function mostrarBinario(){
-  let arreglo = document.getElementById("binario").value;
-  let resultado = '';
+  const arreglo = document.getElementById("binario").value;
 
-  for (let i = 0; i < arreglo.length; i++) {
-    let charCode = arreglo.charCodeAt(i);
-    let binario = '';
-
-    for (let j = 7; j >= 0; j--) {
-      binario += (charCode & (1 << j)) ? '1' : '0';
-    }
-
-    resultado += binario + ' ';
+  // Early return for empty input to match original behavior and avoid unnecessary processing
+  if (arreglo.length === 0) {
+    document.getElementById("bin").textContent = "El número binario es ";
+    console.log("");
+    return;
   }
 
-  document.getElementById("bin").innerHTML = "El número binario es " + resultado.trim();
-  console.log(resultado.trim());
+  // Pre-allocate array to avoid costly O(n^2) string concatenation in hot paths.
+  const len = arreglo.length;
+  const resultArr = new Array(len);
+
+  for (let i = 0; i < len; i++) {
+    // Bitmask charCode with 0xFF to safely replicate original character truncation (for non-ASCII or surrogate codes).
+    resultArr[i] = binaryLookup[arreglo.charCodeAt(i) & 0xFF];
+  }
+
+  const resultado = resultArr.join(' ');
+
+  // Optimize DOM manipulation by using textContent instead of slow innerHTML parsing.
+  document.getElementById("bin").textContent = "El número binario es " + resultado;
+  console.log(resultado);
 }
 
 function mostrarBinario1() {
