@@ -1,20 +1,37 @@
-function mostrarBinario(){
-  let arreglo = document.getElementById("binario").value;
-  let resultado = '';
+// Pre-allocated binary lookup table for 8-bit values (0-255)
+// This avoids costly bitwise operations and repetitive string allocations on each keypress/conversion.
+const BINARY_LOOKUP = new Array(256);
+for (let i = 0; i < 256; i++) {
+  let bin = '';
+  for (let j = 7; j >= 0; j--) {
+    bin += (i & (1 << j)) ? '1' : '0';
+  }
+  BINARY_LOOKUP[i] = bin;
+}
 
-  for (let i = 0; i < arreglo.length; i++) {
-    let charCode = arreglo.charCodeAt(i);
-    let binario = '';
+function mostrarBinario() {
+  const arreglo = document.getElementById("binario").value;
+  const len = arreglo.length;
 
-    for (let j = 7; j >= 0; j--) {
-      binario += (charCode & (1 << j)) ? '1' : '0';
-    }
-
-    resultado += binario + ' ';
+  if (len === 0) {
+    document.getElementById("bin").textContent = "El número binario es";
+    console.log("");
+    return;
   }
 
-  document.getElementById("bin").innerHTML = "El número binario es " + resultado.trim();
-  console.log(resultado.trim());
+  // Optimize performance on large inputs by pre-allocating the array
+  // and joining once, replacing the O(N^2) string concatenation loop.
+  const binaryArray = new Array(len);
+  for (let i = 0; i < len; i++) {
+    // Truncating to 8-bit via & 0xFF perfectly preserves the original behavior
+    // and maps safely into our global lookup table.
+    binaryArray[i] = BINARY_LOOKUP[arreglo.charCodeAt(i) & 0xFF];
+  }
+
+  const resultado = binaryArray.join(' ');
+  // Use textContent instead of innerHTML to prevent unnecessary HTML parsing and improve security.
+  document.getElementById("bin").textContent = "El número binario es " + resultado;
+  console.log(resultado);
 }
 
 function mostrarBinario1() {

@@ -1,0 +1,3 @@
+## 2026-07-20 - Binary Conversion Performance Optimizations
+**Learning:** Character-to-binary string transformations in high-frequency loops are highly susceptible to O(n^2) performance degradation due to string concatenation. Standard lookup tables with `& 0xFF` truncation perfectly match original 8-bit character code bit-shifting while avoiding repetitive bitwise operations and DOM parsing costs associated with `innerHTML`.
+**Action:** Use pre-allocated arrays, `Array.prototype.join()`, static/global lookup tables for 8-bit character conversion, and prefer `textContent` over `innerHTML` for simple text insertions in JavaScript.
