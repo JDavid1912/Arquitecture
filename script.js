@@ -1,20 +1,39 @@
+// Global lookup table precomputing 8-bit binary string representations for indices 0 to 255.
+// This allows O(1) retrieval of binary values, eliminating redundant bitwise operations.
+const binaryLookup = new Array(256);
+for (let i = 0; i < 256; i++) {
+  let bin = '';
+  for (let j = 7; j >= 0; j--) {
+    bin += (i & (1 << j)) ? '1' : '0';
+  }
+  binaryLookup[i] = bin;
+}
+
 function mostrarBinario(){
-  let arreglo = document.getElementById("binario").value;
-  let resultado = '';
+  const arreglo = document.getElementById("binario").value;
 
-  for (let i = 0; i < arreglo.length; i++) {
-    let charCode = arreglo.charCodeAt(i);
-    let binario = '';
-
-    for (let j = 7; j >= 0; j--) {
-      binario += (charCode & (1 << j)) ? '1' : '0';
-    }
-
-    resultado += binario + ' ';
+  if (!arreglo) {
+    document.getElementById("bin").textContent = "El número binario es";
+    console.log('');
+    return;
   }
 
-  document.getElementById("bin").innerHTML = "El número binario es " + resultado.trim();
-  console.log(resultado.trim());
+  const len = arreglo.length;
+  // Pre-allocating the array avoids dynamic scaling overhead and is significantly faster for long inputs.
+  const resultArr = new Array(len);
+
+  for (let i = 0; i < len; i++) {
+    const charCode = arreglo.charCodeAt(i);
+    // Bitmask with 0xFF ensures that char codes > 255 are truncated to 8 bits,
+    // maintaining absolute equivalence with the original nested bitwise loop behavior.
+    resultArr[i] = binaryLookup[charCode & 0xFF];
+  }
+
+  const resultado = resultArr.join(' ');
+
+  // Using textContent instead of innerHTML avoids HTML parsing costs and is more secure.
+  document.getElementById("bin").textContent = "El número binario es " + resultado;
+  console.log(resultado);
 }
 
 function mostrarBinario1() {
