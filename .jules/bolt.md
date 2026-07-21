@@ -1,0 +1,3 @@
+## 2026-07-21 - Character-to-Binary Truncation and Lookup Optimization
+**Learning:** For character-to-binary conversion (0-255 range), using a global precomputed lookup table and `Array.join(' ')` on a pre-allocated array avoids the O(n^2) cost of string concatenation and repetitive bitwise operations. Bitmasking character codes with `0xFF` matches the mathematical truncation of the original nested bitwise loop, preserving absolute correctness.
+**Action:** Replace the dynamic nested bitwise loop in `mostrarBinario` with a global O(1) array lookup and pre-allocated array join, while ensuring input validation and exact equivalence via `charCode & 0xFF`.
