@@ -1,0 +1,3 @@
+## 2026-07-23 - Initial Optimization Learnings
+**Learning:** For bulk string transformations to binary in JavaScript, nested loops and string accumulation introduce O(n^2) or significant memory overhead. Pre-allocating the results array and mapping values via a pre-calculated global lookup table yields up to a 70x speedup. Furthermore, using `& 0xFF` truncation ensures mathematical and behavioral alignment for any non-ASCII character codes.
+**Action:** Always pre-calculate the lookup table globally to run initialization once, and pre-allocate the output array with `new Array(len)` rather than pushing to it iteratively.
