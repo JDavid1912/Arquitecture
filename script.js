@@ -1,20 +1,39 @@
+// Pre-compute 8-bit binary strings for numbers 0-255 for fast O(1) lookups
+const binaryLookup = new Array(256);
+for (let i = 0; i < 256; i++) {
+  let bin = '';
+  for (let j = 7; j >= 0; j--) {
+    bin += (i & (1 << j)) ? '1' : '0';
+  }
+  binaryLookup[i] = bin;
+}
+
 function mostrarBinario(){
   let arreglo = document.getElementById("binario").value;
-  let resultado = '';
+  let len = arreglo.length;
 
-  for (let i = 0; i < arreglo.length; i++) {
-    let charCode = arreglo.charCodeAt(i);
-    let binario = '';
-
-    for (let j = 7; j >= 0; j--) {
-      binario += (charCode & (1 << j)) ? '1' : '0';
-    }
-
-    resultado += binario + ' ';
+  if (len === 0) {
+    // Early return for empty input, keeping text representation consistent with empty output
+    document.getElementById("bin").textContent = "El número binario es ";
+    console.log("");
+    return;
   }
 
-  document.getElementById("bin").innerHTML = "El número binario es " + resultado.trim();
-  console.log(resultado.trim());
+  // Pre-allocate array for high-performance string building and memory optimization
+  let resultArr = new Array(len);
+
+  for (let i = 0; i < len; i++) {
+    // Mask with 0xFF to limit value within 0-255 range and guarantee O(1) lookup
+    // This perfectly replicates the original code's truncation behavior for non-ASCII characters
+    let charCode = arreglo.charCodeAt(i) & 0xFF;
+    resultArr[i] = binaryLookup[charCode];
+  }
+
+  let resultado = resultArr.join(' ');
+
+  // Safer and more performant alternative to innerHTML for plain text
+  document.getElementById("bin").textContent = "El número binario es " + resultado;
+  console.log(resultado);
 }
 
 function mostrarBinario1() {
