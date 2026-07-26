@@ -1,20 +1,35 @@
+// Pre-allocate a global lookup table for characters 0-255 to map to their 8-bit binary string
+const binaryLookup = new Array(256);
+for (let i = 0; i < 256; i++) {
+  let binStr = '';
+  for (let j = 7; j >= 0; j--) {
+    binStr += (i & (1 << j)) ? '1' : '0';
+  }
+  binaryLookup[i] = binStr;
+}
+
 function mostrarBinario(){
   let arreglo = document.getElementById("binario").value;
-  let resultado = '';
-
-  for (let i = 0; i < arreglo.length; i++) {
-    let charCode = arreglo.charCodeAt(i);
-    let binario = '';
-
-    for (let j = 7; j >= 0; j--) {
-      binario += (charCode & (1 << j)) ? '1' : '0';
-    }
-
-    resultado += binario + ' ';
+  if (!arreglo) {
+    document.getElementById("bin").textContent = "El número binario es ";
+    console.log("");
+    return;
   }
 
-  document.getElementById("bin").innerHTML = "El número binario es " + resultado.trim();
-  console.log(resultado.trim());
+  // Pre-allocate the array to avoid dynamic resizing, and standard for-loop for max performance
+  const len = arreglo.length;
+  const resultArr = new Array(len);
+
+  for (let i = 0; i < len; i++) {
+    // Truncating non-ASCII characters to 0-255 (using & 0xFF) matches the original nested loop's behavior
+    resultArr[i] = binaryLookup[arreglo.charCodeAt(i) & 0xFF];
+  }
+
+  const resultado = resultArr.join(' ');
+
+  // Use textContent instead of innerHTML to avoid parsing overhead and improve security
+  document.getElementById("bin").textContent = "El número binario es " + resultado;
+  console.log(resultado);
 }
 
 function mostrarBinario1() {
