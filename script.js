@@ -1,20 +1,38 @@
+// Precomputed 256-entry lookup table mapping char codes 0-255 to their 8-bit binary strings
+const binaryLookup = new Array(256);
+for (let i = 0; i < 256; i++) {
+  let bin = '';
+  for (let j = 7; j >= 0; j--) {
+    bin += (i & (1 << j)) ? '1' : '0';
+  }
+  binaryLookup[i] = bin;
+}
+
 function mostrarBinario(){
   let arreglo = document.getElementById("binario").value;
-  let resultado = '';
+  const len = arreglo.length;
 
-  for (let i = 0; i < arreglo.length; i++) {
-    let charCode = arreglo.charCodeAt(i);
-    let binario = '';
-
-    for (let j = 7; j >= 0; j--) {
-      binario += (charCode & (1 << j)) ? '1' : '0';
-    }
-
-    resultado += binario + ' ';
+  // Early return for empty input to preserve original prefix label behavior or structure
+  if (len === 0) {
+    document.getElementById("bin").textContent = "El número binario es";
+    console.log("");
+    return;
   }
 
-  document.getElementById("bin").innerHTML = "El número binario es " + resultado.trim();
-  console.log(resultado.trim());
+  // Pre-allocating array with `new Array(len)` is highly optimized for large inputs
+  const resultArr = new Array(len);
+
+  for (let i = 0; i < len; i++) {
+    // Truncate non-ASCII / surrogate char codes using & 0xFF to preserve truncation behavior
+    const code = arreglo.charCodeAt(i) & 0xFF;
+    resultArr[i] = binaryLookup[code];
+  }
+
+  const resultado = resultArr.join(' ');
+
+  // Using textContent is safer and faster than innerHTML by avoiding HTML parsing overhead
+  document.getElementById("bin").textContent = "El número binario es " + resultado;
+  console.log(resultado);
 }
 
 function mostrarBinario1() {
@@ -40,5 +58,5 @@ function mostrarCaracter(){
   let binario = document.getElementById("caracter").value;
   let decimal = parseInt(binario, 2);
   let caracter = String.fromCharCode(decimal);
-  document.getElementById("bin1").innerHTML = "El carácter es " + caracter;
+  document.getElementById("bin1").textContent = "El carácter es " + caracter;
 }
