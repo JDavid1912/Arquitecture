@@ -1,0 +1,3 @@
+## 2026-07-27 - Fast text-to-binary with lookup table and array join
+**Learning:** For char-to-binary conversion of large strings, building binary representations using bitwise loops inside a loop is O(n * 8). Precomputing a 256-entry lookup table mapping char codes to binary strings results in O(1) string retrieval per character. Furthermore, using a pre-allocated array instead of O(n^2) string concatenation dramatically speeds up the overall processing time on large inputs (e.g. 50k characters).
+**Action:** Always replace nested loops and bitwise operations with static global lookup tables and avoid string concatenation inside hot paths.
