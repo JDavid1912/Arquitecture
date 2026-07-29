@@ -1,20 +1,33 @@
-function mostrarBinario(){
-  let arreglo = document.getElementById("binario").value;
-  let resultado = '';
+// Global lookup table optimization for 8-bit binary string representation of character codes (0 to 255)
+const binaryLookup = new Array(256);
+for (let i = 0; i < 256; i++) {
+  let bin = '';
+  for (let j = 7; j >= 0; j--) {
+    bin += (i & (1 << j)) ? '1' : '0';
+  }
+  binaryLookup[i] = bin;
+}
 
-  for (let i = 0; i < arreglo.length; i++) {
-    let charCode = arreglo.charCodeAt(i);
-    let binario = '';
+function mostrarBinario() {
+  const inputVal = document.getElementById("binario").value;
+  const len = inputVal.length;
 
-    for (let j = 7; j >= 0; j--) {
-      binario += (charCode & (1 << j)) ? '1' : '0';
-    }
-
-    resultado += binario + ' ';
+  if (len === 0) {
+    document.getElementById("bin").textContent = "El número binario es";
+    return;
   }
 
-  document.getElementById("bin").innerHTML = "El número binario es " + resultado.trim();
-  console.log(resultado.trim());
+  // Pre-allocating standard array for O(1) assignments
+  const arr = new Array(len);
+  for (let i = 0; i < len; i++) {
+    // Masking with 0xFF ensures charCodes are bound within 0-255 lookup table,
+    // exactly replicating the original truncation / non-ASCII handling.
+    const charCode = inputVal.charCodeAt(i) & 0xFF;
+    arr[i] = binaryLookup[charCode];
+  }
+
+  // Join once avoiding O(N^2) string concatenations, update DOM safely using textContent
+  document.getElementById("bin").textContent = "El número binario es " + arr.join(' ');
 }
 
 function mostrarBinario1() {
