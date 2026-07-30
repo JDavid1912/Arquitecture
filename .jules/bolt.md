@@ -1,0 +1,3 @@
+## 2026-07-30 - Lookup-table Character-to-Binary Conversion
+**Learning:** For character-to-binary string conversion, pre-allocating a JavaScript array (`new Array(len)`) and using `Array.join(' ')` is significantly faster than using nested bitwise loops or `Array.from()` combined with string concatenation. Using a global lookup table initialized once for characters 0-255 provides O(1) binary string retrieval.
+**Action:** When handling bulk string-to-binary or similar conversions, initialize an O(1) global lookup table and build results using pre-allocated arrays to avoid O(n^2) or high allocation overhead. Ensure proper bitmasking (e.g., `charCode & 0xFF`) to guarantee truncation behavior identical to the original logic.
