@@ -1,0 +1,3 @@
+## 2026-07-31 - Initial Learnings on Binary Converter Codebase
+**Learning:** In character-to-binary string conversion, O(n^2) string concatenation can be significantly optimized (up to ~70x speedup) to O(n) by leveraging a global pre-computed lookup table for the ASCII values (0-255), pre-allocating a fixed-size array (`new Array(len)`), and doing an `Array.join(' ')`. Truncation with `& 0xFF` is necessary to ensure surrogate pairs or non-ASCII characters match original behavior.
+**Action:** Use global lookup tables for fixed range inputs, pre-allocate arrays when string lengths are known, and use bitmasking to preserve character truncation boundaries exactly.

@@ -1,20 +1,36 @@
+// Pre-computed lookup table for O(1) binary retrieval (characters 0-255)
+const binaryLookup = new Array(256);
+for (let i = 0; i < 256; i++) {
+  let bin = '';
+  for (let j = 7; j >= 0; j--) {
+    bin += (i & (1 << j)) ? '1' : '0';
+  }
+  binaryLookup[i] = bin;
+}
+
 function mostrarBinario(){
-  let arreglo = document.getElementById("binario").value;
-  let resultado = '';
+  const arreglo = document.getElementById("binario").value;
 
-  for (let i = 0; i < arreglo.length; i++) {
-    let charCode = arreglo.charCodeAt(i);
-    let binario = '';
-
-    for (let j = 7; j >= 0; j--) {
-      binario += (charCode & (1 << j)) ? '1' : '0';
-    }
-
-    resultado += binario + ' ';
+  if (arreglo.length === 0) {
+    document.getElementById("bin").textContent = "El número binario es ";
+    return;
   }
 
-  document.getElementById("bin").innerHTML = "El número binario es " + resultado.trim();
-  console.log(resultado.trim());
+  const len = arreglo.length;
+  // Pre-allocating array with `new Array(len)` is highly efficient for bulk processing
+  const resultArr = new Array(len);
+
+  for (let i = 0; i < len; i++) {
+    // Bitwise mask 0xFF to mimic original character truncation for non-ASCII/surrogate characters
+    const charCode = arreglo.charCodeAt(i) & 0xFF;
+    resultArr[i] = binaryLookup[charCode];
+  }
+
+  // Join once at the end instead of concatenating strings in the loop
+  const resultado = resultArr.join(' ');
+
+  // Update DOM using textContent instead of innerHTML for better performance and security
+  document.getElementById("bin").textContent = "El número binario es " + resultado;
 }
 
 function mostrarBinario1() {
