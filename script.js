@@ -1,20 +1,35 @@
+// Pre-calculated lookup table for 8-bit binary representation of character codes 0-255.
+// This allows O(1) retrieval of binary values, eliminating nested loops during translation.
+const binaryLookup = new Array(256);
+for (let i = 0; i < 256; i++) {
+  let bin = '';
+  for (let j = 7; j >= 0; j--) {
+    bin += (i & (1 << j)) ? '1' : '0';
+  }
+  binaryLookup[i] = bin;
+}
+
 function mostrarBinario(){
-  let arreglo = document.getElementById("binario").value;
-  let resultado = '';
+  const arreglo = document.getElementById("binario").value;
+  const len = arreglo.length;
 
-  for (let i = 0; i < arreglo.length; i++) {
-    let charCode = arreglo.charCodeAt(i);
-    let binario = '';
-
-    for (let j = 7; j >= 0; j--) {
-      binario += (charCode & (1 << j)) ? '1' : '0';
-    }
-
-    resultado += binario + ' ';
+  if (len === 0) {
+    document.getElementById("bin").textContent = "El número binario es ";
+    return;
   }
 
-  document.getElementById("bin").innerHTML = "El número binario es " + resultado.trim();
-  console.log(resultado.trim());
+  // Pre-allocate the array to avoid repeated dynamic resizing or string concatenation (O(N^2)).
+  const resultArr = new Array(len);
+
+  for (let i = 0; i < len; i++) {
+    // Truncate to 8-bit character code (& 0xFF) to match original bitwise behavior
+    // and safely index into our 256-entry lookup table.
+    resultArr[i] = binaryLookup[arreglo.charCodeAt(i) & 0xFF];
+  }
+
+  // Joining is much faster than successive string concatenations.
+  // Using textContent instead of innerHTML avoids overhead of HTML parsing and protects against XSS.
+  document.getElementById("bin").textContent = "El número binario es " + resultArr.join(' ');
 }
 
 function mostrarBinario1() {
