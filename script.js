@@ -1,20 +1,33 @@
+// Pre-computed lookup table for 8-bit binary representation of character codes 0 to 255.
+// This optimizes character-to-binary conversion to O(1) per character.
+const binaryLookup = new Array(256);
+for (let i = 0; i < 256; i++) {
+  let bin = '';
+  for (let j = 7; j >= 0; j--) {
+    bin += (i & (1 << j)) ? '1' : '0';
+  }
+  binaryLookup[i] = bin;
+}
+
 function mostrarBinario(){
   let arreglo = document.getElementById("binario").value;
-  let resultado = '';
+  let len = arreglo.length;
 
-  for (let i = 0; i < arreglo.length; i++) {
-    let charCode = arreglo.charCodeAt(i);
-    let binario = '';
-
-    for (let j = 7; j >= 0; j--) {
-      binario += (charCode & (1 << j)) ? '1' : '0';
-    }
-
-    resultado += binario + ' ';
+  if (len === 0) {
+    document.getElementById("bin").textContent = "El número binario es";
+    return;
   }
 
-  document.getElementById("bin").innerHTML = "El número binario es " + resultado.trim();
-  console.log(resultado.trim());
+  // Pre-allocate the array for maximum conversion performance
+  let resultArr = new Array(len);
+
+  for (let i = 0; i < len; i++) {
+    // Truncating to 0-255 using bitmasking & 0xFF to preserve behavior for non-ASCII characters
+    resultArr[i] = binaryLookup[arreglo.charCodeAt(i) & 0xFF];
+  }
+
+  // Use textContent instead of innerHTML for faster, safer DOM rendering, and join elements cleanly
+  document.getElementById("bin").textContent = "El número binario es " + resultArr.join(' ');
 }
 
 function mostrarBinario1() {
@@ -40,5 +53,5 @@ function mostrarCaracter(){
   let binario = document.getElementById("caracter").value;
   let decimal = parseInt(binario, 2);
   let caracter = String.fromCharCode(decimal);
-  document.getElementById("bin1").innerHTML = "El carácter es " + caracter;
+  document.getElementById("bin1").textContent = "El carácter es " + caracter;
 }
