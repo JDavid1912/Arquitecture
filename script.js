@@ -1,20 +1,41 @@
-function mostrarBinario(){
-  let arreglo = document.getElementById("binario").value;
-  let resultado = '';
+// Global lookup table for 8-bit binary representation of character codes 0-255.
+// Pre-computing this once avoids expensive bitwise operations in the main loop.
+const binaryLookup = new Array(256);
+for (let i = 0; i < 256; i++) {
+  let bin = '';
+  for (let j = 7; j >= 0; j--) {
+    bin += (i & (1 << j)) ? '1' : '0';
+  }
+  binaryLookup[i] = bin;
+}
 
-  for (let i = 0; i < arreglo.length; i++) {
-    let charCode = arreglo.charCodeAt(i);
-    let binario = '';
+/**
+ * Converts the input text character-by-character into its 8-bit binary representation.
+ * Optimized for performance:
+ * - Uses a precomputed lookup table to eliminate bitwise loops.
+ * - Pre-allocates a fixed-size array instead of doing repetitive string concatenation (O(n^2)).
+ * - Uses .textContent instead of .innerHTML for faster and safer DOM updates.
+ */
+function mostrarBinario() {
+  const inputVal = document.getElementById("binario").value;
+  const len = inputVal.length;
 
-    for (let j = 7; j >= 0; j--) {
-      binario += (charCode & (1 << j)) ? '1' : '0';
-    }
-
-    resultado += binario + ' ';
+  if (len === 0) {
+    document.getElementById("bin").textContent = "El número binario es ";
+    console.log("");
+    return;
   }
 
-  document.getElementById("bin").innerHTML = "El número binario es " + resultado.trim();
-  console.log(resultado.trim());
+  // Pre-allocating the array avoids dynamic resizing overhead.
+  const resultado = new Array(len);
+  for (let i = 0; i < len; i++) {
+    // Masking with 0xFF ensures we only index within 0-255, preserving truncation behavior.
+    resultado[i] = binaryLookup[inputVal.charCodeAt(i) & 0xFF];
+  }
+
+  const output = resultado.join(' ');
+  document.getElementById("bin").textContent = "El número binario es " + output;
+  console.log(output);
 }
 
 function mostrarBinario1() {
