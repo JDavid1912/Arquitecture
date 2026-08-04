@@ -1,0 +1,3 @@
+## 2026-08-04 - Lookup Table & DOM Output Optimization in Javascript
+**Learning:** For performance-sensitive operations involving character-to-binary or character-to-number lookups, implementing a pre-computed global lookup table combined with `Array.join(' ')` avoids expensive string concatenation and bitwise loop overhead. Replacing `.innerHTML` with `.textContent` avoids HTML parsing and improves text insertion performance.
+**Action:** Apply global lookup tables for character processing pipelines and use `textContent` when updating text elements. Ensure UTC date consistency in logs and journals.
