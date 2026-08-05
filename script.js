@@ -1,44 +1,63 @@
+// Global lookup table for characters 0-255 to map them to 8-bit binary strings
+// Speed is a feature; pre-computing these prevents nested bitwise calculations in hot loops.
+const BINARY_LOOKUP = new Array(256);
+for (let i = 0; i < 256; i++) {
+  let bin = '';
+  for (let j = 7; j >= 0; j--) {
+    bin += (i & (1 << j)) ? '1' : '0';
+  }
+  BINARY_LOOKUP[i] = bin;
+}
+
 function mostrarBinario(){
-  let arreglo = document.getElementById("binario").value;
-  let resultado = '';
-
-  for (let i = 0; i < arreglo.length; i++) {
-    let charCode = arreglo.charCodeAt(i);
-    let binario = '';
-
-    for (let j = 7; j >= 0; j--) {
-      binario += (charCode & (1 << j)) ? '1' : '0';
-    }
-
-    resultado += binario + ' ';
+  const arreglo = document.getElementById("binario").value;
+  const len = arreglo.length;
+  if (len === 0) {
+    document.getElementById("bin").textContent = "El número binario es";
+    console.log("");
+    return;
   }
 
-  document.getElementById("bin").innerHTML = "El número binario es " + resultado.trim();
-  console.log(resultado.trim());
+  // Pre-allocating array with `new Array(len)` and utilizing standard for-loop with BINARY_LOOKUP
+  // offers O(1) binary retrieval and prevents the O(n^2) string concatenation overhead.
+  const resultArr = new Array(len);
+  for (let i = 0; i < len; i++) {
+    resultArr[i] = BINARY_LOOKUP[arreglo.charCodeAt(i) & 0xFF];
+  }
+
+  const resultado = resultArr.join(' ');
+  // Using textContent instead of innerHTML is much faster and more secure.
+  document.getElementById("bin").textContent = "El número binario es " + resultado;
+  console.log(resultado);
 }
 
 function mostrarBinario1() {
-  let binario = document.getElementById("binario1").value;
-  let caracteres = '';
-
-  for (let i = 0; i < binario.length; i += 8) {
-    let byte = binario.substr(i, 8);
-    let charCode = 0;
-
-    for (let j = 0; j < byte.length; j++) {
-      charCode = charCode * 2 + (byte[j] === '1' ? 1 : 0);
-    }
-
-    caracteres += String.fromCharCode(charCode);
+  const binario = document.getElementById("binario1").value;
+  const len = binario.length;
+  if (len === 0) {
+    document.getElementById("bin1").textContent = "El carácter es";
+    console.log("");
+    return;
   }
 
-  document.getElementById("bin1").innerHTML = "El carácter es " + caracteres;
+  // Optimize conversion from binary to characters using parseInt(byte, 2) and substr.
+  // Using pre-allocated array of size Math.ceil(len / 8) is extremely efficient for large inputs.
+  const arrLen = Math.ceil(len / 8);
+  const charsArr = new Array(arrLen);
+  let idx = 0;
+
+  for (let i = 0; i < len; i += 8) {
+    charsArr[idx++] = String.fromCharCode(parseInt(binario.substr(i, 8), 2));
+  }
+
+  const caracteres = charsArr.join('');
+  document.getElementById("bin1").textContent = "El carácter es " + caracteres;
   console.log(caracteres);
 }
 
 function mostrarCaracter(){  
-  let binario = document.getElementById("caracter").value;
-  let decimal = parseInt(binario, 2);
-  let caracter = String.fromCharCode(decimal);
-  document.getElementById("bin1").innerHTML = "El carácter es " + caracter;
+  const binario = document.getElementById("caracter").value;
+  const decimal = parseInt(binario, 2);
+  const caracter = isNaN(decimal) ? "" : String.fromCharCode(decimal);
+  document.getElementById("bin1").textContent = "El carácter es " + caracter;
 }
