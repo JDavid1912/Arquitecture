@@ -1,0 +1,3 @@
+## 2026-08-13 - Lookup Table Optimization & Array Allocation Speedups
+**Learning:** For transforming strings to arrays/character code representations under hot paths or bulk inputs, pre-allocating the target array using `new Array(len)` and direct indexing in a standard `for` loop is significantly more efficient than dynamic pushing or nested bitwise loop calculations. Precomputing binary mappings in an O(1) global array provides substantial speedup. Masking values with `0xFF` ensures identical behavior for non-ASCII/surrogate pairs by mimicking character truncation.
+**Action:** Always precompute tables for fixed domains (e.g., 0-255 ASCII values) and pre-allocate arrays to optimize hot loops instead of doing repeated bitwise calculations and string concatenations.
