@@ -1,20 +1,36 @@
+// Precomputed lookup table for character codes 0-255 to map them to 8-bit binary strings.
+// This delivers O(1) binary conversion for any ASCII or 8-bit character code.
+const BINARY_LOOKUP = new Array(256);
+for (let i = 0; i < 256; i++) {
+  let bin = '';
+  for (let j = 7; j >= 0; j--) {
+    bin += (i & (1 << j)) ? '1' : '0';
+  }
+  BINARY_LOOKUP[i] = bin;
+}
+
 function mostrarBinario(){
   let arreglo = document.getElementById("binario").value;
-  let resultado = '';
-
-  for (let i = 0; i < arreglo.length; i++) {
-    let charCode = arreglo.charCodeAt(i);
-    let binario = '';
-
-    for (let j = 7; j >= 0; j--) {
-      binario += (charCode & (1 << j)) ? '1' : '0';
-    }
-
-    resultado += binario + ' ';
+  if (!arreglo) {
+    document.getElementById("bin").textContent = "El número binario es ";
+    return;
   }
 
-  document.getElementById("bin").innerHTML = "El número binario es " + resultado.trim();
-  console.log(resultado.trim());
+  let len = arreglo.length;
+  // Pre-allocating the array avoids dynamic resizing overhead and is highly efficient in V8.
+  let resultado = new Array(len);
+
+  // O(n) loop: converting each character using the precomputed O(1) lookup table.
+  // Using & 0xFF matches original truncation behavior for non-ASCII/surrogate pair characters.
+  for (let i = 0; i < len; i++) {
+    resultado[i] = BINARY_LOOKUP[arreglo.charCodeAt(i) & 0xFF];
+  }
+
+  // Using Array.join(' ') is significantly faster than repeated string concatenation.
+  // textContent is used instead of innerHTML to avoid parsing overhead and improve security.
+  let finalStr = resultado.join(' ');
+  document.getElementById("bin").textContent = "El número binario es " + finalStr;
+  console.log(finalStr);
 }
 
 function mostrarBinario1() {
