@@ -1,20 +1,28 @@
+// Pre-computed lookup table for 8-bit binary strings (0-255)
+const BINARY_LOOKUP = new Array(256);
+for (let i = 0; i < 256; i++) {
+  BINARY_LOOKUP[i] = i.toString(2).padStart(8, '0');
+}
+
 function mostrarBinario(){
   let arreglo = document.getElementById("binario").value;
-  let resultado = '';
+  let len = arreglo.length;
 
-  for (let i = 0; i < arreglo.length; i++) {
-    let charCode = arreglo.charCodeAt(i);
-    let binario = '';
-
-    for (let j = 7; j >= 0; j--) {
-      binario += (charCode & (1 << j)) ? '1' : '0';
-    }
-
-    resultado += binario + ' ';
+  if (len === 0) {
+    document.getElementById("bin").textContent = "El número binario es ";
+    console.log("");
+    return;
   }
 
-  document.getElementById("bin").innerHTML = "El número binario es " + resultado.trim();
-  console.log(resultado.trim());
+  // Pre-allocate array for binary representations to avoid O(N) string concatenation in loop
+  let parts = new Array(len);
+  for (let i = 0; i < len; i++) {
+    parts[i] = BINARY_LOOKUP[arreglo.charCodeAt(i) & 0xFF];
+  }
+
+  let resultadoFormatted = parts.join(" ");
+  document.getElementById("bin").textContent = "El número binario es " + resultadoFormatted;
+  console.log(resultadoFormatted);
 }
 
 function mostrarBinario1() {
