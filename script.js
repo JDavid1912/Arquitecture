@@ -1,20 +1,32 @@
+// Pre-computed lookup table for 8-bit binary strings (0 to 255)
+// Provides O(1) binary string conversion per character instead of nested bitwise loops
+const BINARY_LOOKUP = new Array(256);
+for (let i = 0; i < 256; i++) {
+  BINARY_LOOKUP[i] = i.toString(2).padStart(8, '0');
+}
+
 function mostrarBinario(){
   let arreglo = document.getElementById("binario").value;
-  let resultado = '';
+  let len = arreglo.length;
 
-  for (let i = 0; i < arreglo.length; i++) {
-    let charCode = arreglo.charCodeAt(i);
-    let binario = '';
-
-    for (let j = 7; j >= 0; j--) {
-      binario += (charCode & (1 << j)) ? '1' : '0';
-    }
-
-    resultado += binario + ' ';
+  if (len === 0) {
+    document.getElementById("bin").textContent = "El número binario es ";
+    console.log("");
+    return;
   }
 
-  document.getElementById("bin").innerHTML = "El número binario es " + resultado.trim();
-  console.log(resultado.trim());
+  // Pre-allocate array for binary bytes to avoid O(N^2) string concatenation in loop
+  let bytes = new Array(len);
+  for (let i = 0; i < len; i++) {
+    // Truncate to 8 bits using & 0xFF to maintain 1-byte binary output behavior
+    bytes[i] = BINARY_LOOKUP[arreglo.charCodeAt(i) & 0xFF];
+  }
+
+  let resultado = bytes.join(' ');
+
+  // Use textContent instead of innerHTML for better performance and security
+  document.getElementById("bin").textContent = "El número binario es " + resultado;
+  console.log(resultado);
 }
 
 function mostrarBinario1() {
@@ -32,7 +44,7 @@ function mostrarBinario1() {
     caracteres += String.fromCharCode(charCode);
   }
 
-  document.getElementById("bin1").innerHTML = "El carácter es " + caracteres;
+  document.getElementById("bin1").textContent = "El carácter es " + caracteres;
   console.log(caracteres);
 }
 
@@ -40,5 +52,5 @@ function mostrarCaracter(){
   let binario = document.getElementById("caracter").value;
   let decimal = parseInt(binario, 2);
   let caracter = String.fromCharCode(decimal);
-  document.getElementById("bin1").innerHTML = "El carácter es " + caracter;
+  document.getElementById("bin1").textContent = "El carácter es " + caracter;
 }
