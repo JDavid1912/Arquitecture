@@ -1,20 +1,34 @@
+// Global lookup table for 8-bit binary representation of character codes (0-255).
+// Initializing once avoids repeated toString(2) and bitwise loop calculations.
+const BINARY_LOOKUP = new Array(256);
+for (let i = 0; i < 256; i++) {
+  BINARY_LOOKUP[i] = i.toString(2).padStart(8, '0');
+}
+
+/**
+ * Converts input text into a space-separated sequence of 8-bit binary numbers.
+ * Optimized using a pre-computed lookup table and Array.join to avoid O(n^2) string concatenation.
+ */
 function mostrarBinario(){
   let arreglo = document.getElementById("binario").value;
-  let resultado = '';
 
-  for (let i = 0; i < arreglo.length; i++) {
-    let charCode = arreglo.charCodeAt(i);
-    let binario = '';
-
-    for (let j = 7; j >= 0; j--) {
-      binario += (charCode & (1 << j)) ? '1' : '0';
-    }
-
-    resultado += binario + ' ';
+  if (!arreglo) {
+    document.getElementById("bin").textContent = "El número binario es ";
+    console.log("");
+    return;
   }
 
-  document.getElementById("bin").innerHTML = "El número binario es " + resultado.trim();
-  console.log(resultado.trim());
+  let len = arreglo.length;
+  let bytes = new Array(len);
+
+  for (let i = 0; i < len; i++) {
+    // Bitwise AND with 0xFF ensures char codes map correctly to 8-bit lookup table
+    bytes[i] = BINARY_LOOKUP[arreglo.charCodeAt(i) & 0xFF];
+  }
+
+  let resultado = bytes.join(' ');
+  document.getElementById("bin").textContent = "El número binario es " + resultado;
+  console.log(resultado);
 }
 
 function mostrarBinario1() {
