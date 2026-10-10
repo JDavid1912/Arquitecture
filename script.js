@@ -1,20 +1,26 @@
+// Pre-computed 256-element lookup table for 8-bit binary representation.
+// Provides O(1) binary conversion for 8-bit char codes without bitwise loops.
+const BINARY_LOOKUP = new Array(256);
+for (let i = 0; i < 256; i++) {
+  BINARY_LOOKUP[i] = i.toString(2).padStart(8, '0');
+}
+
 function mostrarBinario(){
   let arreglo = document.getElementById("binario").value;
+  let len = arreglo.length;
   let resultado = '';
 
-  for (let i = 0; i < arreglo.length; i++) {
-    let charCode = arreglo.charCodeAt(i);
-    let binario = '';
-
-    for (let j = 7; j >= 0; j--) {
-      binario += (charCode & (1 << j)) ? '1' : '0';
+  if (len > 0) {
+    // Pre-allocate array and join to prevent O(n^2) string concatenation in loops
+    let bytes = new Array(len);
+    for (let i = 0; i < len; i++) {
+      bytes[i] = BINARY_LOOKUP[arreglo.charCodeAt(i) & 0xFF];
     }
-
-    resultado += binario + ' ';
+    resultado = bytes.join(' ');
   }
 
-  document.getElementById("bin").innerHTML = "El número binario es " + resultado.trim();
-  console.log(resultado.trim());
+  document.getElementById("bin").textContent = "El número binario es " + resultado;
+  console.log(resultado);
 }
 
 function mostrarBinario1() {
