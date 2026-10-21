@@ -1,20 +1,28 @@
+// Global binary lookup table for 8-bit character codes (0-255) to avoid repeated bitwise operations
+const BINARY_LOOKUP = new Array(256);
+for (let i = 0; i < 256; i++) {
+  BINARY_LOOKUP[i] = i.toString(2).padStart(8, '0');
+}
+
 function mostrarBinario(){
   let arreglo = document.getElementById("binario").value;
-  let resultado = '';
+  let len = arreglo.length;
 
-  for (let i = 0; i < arreglo.length; i++) {
-    let charCode = arreglo.charCodeAt(i);
-    let binario = '';
-
-    for (let j = 7; j >= 0; j--) {
-      binario += (charCode & (1 << j)) ? '1' : '0';
-    }
-
-    resultado += binario + ' ';
+  if (len === 0) {
+    document.getElementById("bin").textContent = "El número binario es ";
+    console.log("");
+    return;
   }
 
-  document.getElementById("bin").innerHTML = "El número binario es " + resultado.trim();
-  console.log(resultado.trim());
+  // Pre-allocate array and join to avoid O(n^2) string concatenation in loops
+  let result = new Array(len);
+  for (let i = 0; i < len; i++) {
+    result[i] = BINARY_LOOKUP[arreglo.charCodeAt(i) & 0xFF];
+  }
+
+  let finalStr = result.join(' ');
+  document.getElementById("bin").textContent = "El número binario es " + finalStr;
+  console.log(finalStr);
 }
 
 function mostrarBinario1() {
@@ -32,7 +40,7 @@ function mostrarBinario1() {
     caracteres += String.fromCharCode(charCode);
   }
 
-  document.getElementById("bin1").innerHTML = "El carácter es " + caracteres;
+  document.getElementById("bin1").textContent = "El carácter es " + caracteres;
   console.log(caracteres);
 }
 
@@ -40,5 +48,5 @@ function mostrarCaracter(){
   let binario = document.getElementById("caracter").value;
   let decimal = parseInt(binario, 2);
   let caracter = String.fromCharCode(decimal);
-  document.getElementById("bin1").innerHTML = "El carácter es " + caracter;
+  document.getElementById("bin1").textContent = "El carácter es " + caracter;
 }
